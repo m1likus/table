@@ -1,0 +1,10 @@
+^C:\USERS\VALERIA\DESKTOP\FOLDER\LAB1-TABLE\CMAKELISTS.TXT
+setlocal
+D:\cmake\bin\cmake.exe -SC:/Users/Valeria/Desktop/folder/lab1-table -BC:/Users/Valeria/Desktop/folder/lab1-table/build --check-stamp-file C:/Users/Valeria/Desktop/folder/lab1-table/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
