@@ -1,7 +1,38 @@
 #include <iostream>
 #include <algorithm>
+#include <vector>
 
 using namespace std;
+template<typename TypeKey, typename T>
+class Iterator {
+	friend class Table;
+protected:
+	pair<TypeKey, T>* iterator;
+public:
+	Iterator(pair<TypeKey, T>& data) {
+		iterator = &data;
+	}
+
+	T& operator*() const {
+		return iterator->second;
+	}
+	/* TODO: dodelac
+	T& operator->() const {
+		return *iterator;
+	}*/
+	Iterator& operator++() {
+		iterator++;
+		return *this;
+	}
+	Iterator& operator--() {
+		iterator--;
+		return *this;
+	}
+	Iterator operator+(int offset) {
+		Iterator<T> tmp = *this;
+		tmp.iterator += offset;
+	}
+};
 
 template <typename TypeKey, typename TypeData>
 class Table {
@@ -12,15 +43,18 @@ class Table {
 			if (storage[i].first == key)
 				return *storage.second;
 		}
+		storage.push_back(make_pair(key, TypeData()));
+		return storage.back().second;
 	}
-	Iterator& find(const TypeKey& key) {
+
+	Iterator<TypeKey, TypeData>& find(const TypeKey& key) {
 		for (int i = 0; i < storage.size(); i++) {
 			if (storage[i].first == key)
-				return Iterator(&storage[i].second());
+				return begin() + i;
 		}
-		return end;
+		return end();
 	}
-	Iterator& insert(const TypeKey& key, const TypeData& data) {
+	/*Iterator& insert(const TypeKey& key, const TypeData& data) {
 		for (int i = 0; i < storage.size(); i++) {
 			if (storage[i].first == key)
 				storage.insert(i, <key, data>);
@@ -35,35 +69,13 @@ class Table {
 			return true;
 		}
 		return false;
-	}
+	}*/
 	Iterator& begin() {
-		return Iterator(&storage[0].second());
+		return Iterator(storage[0]);
 	}
 	Iterator& end() {
-		return Iterator(&storage[storage.size()+1].second());
+		return begin() + storage.size();
 	}
 
 };
 
-template<typename T>
-class Iterator {
-	friend class Table;
-protected:
-	T* iterator;
-public:
-	T& operator*() const {
-		return *iterator;
-	}
-	T* operator->() const {
-		return iterator;
-	}
-	Iterator& operator++() {
-		iterator++;
-		return *this;
-	}
-	Iterator& operator--() {
-		iterator--;
-		return *this;
-	}
-
-};
