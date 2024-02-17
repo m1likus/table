@@ -1,3 +1,0 @@
-C:/Users/Valeria/Desktop/folder/lab1-table/build/CMakeFiles/table.dir
-C:/Users/Valeria/Desktop/folder/lab1-table/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/Valeria/Desktop/folder/lab1-table/build/CMakeFiles/ZERO_CHECK.dir
