@@ -147,5 +147,10 @@ public:
 
 template<typename TypeKey, typename TypeData>
 class SortTable : protected Table {
-	//+сделай пж вывод для table и sort table
+	/*vector <pair<typekey, typedata>> storage;
+	SortTable(int s) :Table<TypeKey, TypeData>(s){
+		Table<TypeKey, TypeData>::storage = 
+	}
+	bool comp(const TypeKey& a, const TypeKey& b)
+		return a < b;*/
 };

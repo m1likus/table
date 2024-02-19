@@ -19,8 +19,8 @@ set(MP2_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 include_directories("${MP2_INCLUDE}" gtest)
 
 #BUILD
-# add_subdirectory(gtest)
-# add_subdirectory(test)
+add_subdirectory(gtest)
+add_subdirectory(test)
 add_executable (table src/main.cpp include/table.h)
 
 # REPORT
