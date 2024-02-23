@@ -14,7 +14,7 @@ protected:
 public:
 //--------------------------------------------------------------------------------//
 	Table() { //конструктор по умолчанию
-		storage = vector<pair<TypeKey, TypeData>>;
+		storage = vector<pair<TypeKey, TypeData>>();
 	}
 //--------------------------------------------------------------------------------//
 	Table(int size) { //конструктор с параметрами
@@ -48,7 +48,7 @@ public:
 	}
 //--------------------------------------------------------------------------------//
 	//возвращаемое значение - ссылка на итератор на найденный элемент
-	Iterator<TypeKey, TypeData>& find(const TypeKey& key) { 
+	Iterator<TypeKey, TypeData> find(const TypeKey& key) { 
 		for (int i = 0; i < storage.size(); i++) {
 			if (storage[i].first == key) //нашли ключ
 				return begin() + i; //возвращаем ссылку на итератор
@@ -56,32 +56,36 @@ public:
 		return end(); //иначе возвращаем итератор на конец
 	}
 //--------------------------------------------------------------------------------//
-	Iterator<TypeKey, TypeData>& insert(const TypeKey& key, const TypeData& data) {
+	Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data) {
 		//...
-		for (int i = 0; i < storage.size(); i++) {
-			if (storage[i].first == key) //нашли ключ, перед к-ым надо вставить
-				storage.insert(i, make_pair(key, data)); //вставили
-			return begin() + i; // ...
-		}
+		//for (int i = 0; i < storage.size(); i++) {
+		//	if (storage[i].first == key) //нашли ключ, перед к-ым надо вставить
+		//		storage.insert(i, make_pair(key, data)); //вставили
+		//	return begin() + i; // ...
+		//}
+		int i = storage.size();
+		storage.push_back(make_pair(key, data));
+		return begin() + i;
 	}
 //--------------------------------------------------------------------------------//
 	//возвращаем true/false
 	bool remove(const TypeKey& key) {
 		for (int i = 0; i < storage.size(); i++) {
-			if (storage[i].first == key) //нашли 
-				storage.erase(i); //убрали
-			return true;
+			if (storage[i].first == key) { //нашли 
+				storage.erase(storage.begin()+i); //убрали
+				return true;
+			}
 		}
 		return false;
 	}
 //--------------------------------------------------------------------------------//
 	//итератор на начало
-	Iterator<TypeKey, TypeData>& begin() {
+	Iterator<TypeKey, TypeData> begin() {
 		return Iterator<TypeKey, TypeData>(storage[0]);
 	}
 //--------------------------------------------------------------------------------//
 	//итератор на конец
-	Iterator<TypeKey, TypeData>& end() {
+	Iterator<TypeKey, TypeData> end() {
 		Iterator<TypeKey, TypeData> a = begin();
 		return a + storage.size();
 	}
@@ -108,7 +112,7 @@ public:
 	}
 //--------------------------------------------------------------------------------//
 	~Iterator() { //деструктор
-		delete iterator;
+		iterator=0;
 	}
 //--------------------------------------------------------------------------------//
 	T& operator*() const { //получение элемента, на который указывает итератор
@@ -146,11 +150,10 @@ public:
 };
 
 template<typename TypeKey, typename TypeData>
-class SortTable : protected Table {
-	/*vector <pair<typekey, typedata>> storage;
+class SortTable : public Table<TypeKey, TypeData> {
+public:
 	SortTable(int s) :Table<TypeKey, TypeData>(s){
-		Table<TypeKey, TypeData>::storage = 
 	}
-	bool comp(const TypeKey& a, const TypeKey& b)
-		return a < b;*/
+	//bool comp(const TypeKey& a, const TypeKey& b)
+	//	return a < b;
 };
