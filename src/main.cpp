@@ -19,22 +19,32 @@ int main() {
 	//}
 	//cout << cnt1;
 
+	//Table<int, int> a;
+	//for (int i = 0; i < 5; i++) {
+	//	a.insert(i,i);
+	//}
+	//for (int i = 0; i < 5; i++) {
+	//	cout << a[i]<<" ";
+	//}
+	//cout << "\n";
+	//
+	//cout << *a.find(3) << "\n";
+	//
+	//if (a.remove(3)) {
+	//	if (a.find(3) == a.end())
+	//		cout << "yes";
+	//}
+
+	vector<int> key = { 2,5,3,6,4 };
+	vector<int> data = { 1,2,3,4,5 };
 	Table<int, int> a;
 	for (int i = 0; i < 5; i++) {
-		a.insert(i,i);
+		a[key[i]] = data[i];
 	}
-	for (int i = 0; i < 5; i++) {
-		cout << a[i]<<" ";
-	}
-	cout << "\n";
-
-	cout << *a.find(3) << "\n";
-
-	if (a.remove(3)) {
-		if (a.find(3) == a.end())
-			cout << "yes";
-	}
-
+	int pos = 3;
+	if ((a.begin() + pos) == a.find(key[pos]))
+		cout << 1;
+	else cout << 0;
 
 	return 0;
 }
