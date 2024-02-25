@@ -58,11 +58,6 @@ public:
 //--------------------------------------------------------------------------------//
 	Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data) {
 		//...
-		//for (int i = 0; i < storage.size(); i++) {
-		//	if (storage[i].first == key) //нашли ключ, перед к-ым надо вставить
-		//		storage.insert(i, make_pair(key, data)); //вставили
-		//	return begin() + i; // ...
-		//}
 		int i = storage.size();
 		storage.push_back(make_pair(key, data));
 		return begin() + i;
@@ -98,10 +93,6 @@ class Iterator {
 protected:
 	pair<TypeKey, T>* iterator;
 public:
-	//--------------------------------------------------------------------------------//
-	Iterator() { //конструктор по умолчанию
-		iterator = nullptr;
-	}
 //--------------------------------------------------------------------------------//
 	Iterator(pair<TypeKey, T>& data) { //конструктор с параметрами
 		iterator = &data;
@@ -110,11 +101,7 @@ public:
 	Iterator(const Iterator& other) { //конструктор копирования
 		iterator = other.iterator;
 	}
-//--------------------------------------------------------------------------------//
-	~Iterator() { //деструктор
-		iterator=0;
-	}
-//--------------------------------------------------------------------------------//
+//---------------------------------------------------------------------//
 	T& operator*() const { //получение элемента, на который указывает итератор
 		return iterator->second;
 	}
@@ -154,6 +141,8 @@ class SortTable : public Table<TypeKey, TypeData> {
 public:
 	SortTable(int s) :Table<TypeKey, TypeData>(s){
 	}
-	//bool comp(const TypeKey& a, const TypeKey& b)
-	//	return a < b;
+	Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data) {
+		//...
+		
+	}
 };

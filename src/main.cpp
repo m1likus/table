@@ -3,21 +3,21 @@
 using namespace std;
 
 int main() {
-	//Table<int, int> a(3);
-	//Iterator<int, int> b(make_pair(0, 0));
-	//int cnt = 0;
-	//
-	//for (auto i = a.begin(); i != a.end(); ++i) {
-	//	cnt++;
-	//}
-	//cout << cnt<<"\n";
-	//
-	//SortTable<int, int> s(3);
-	//int cnt1 = 0;
-	//for (auto i = s.begin(); i != s.end(); ++i) {
-	//	cnt1++;
-	//}
-	//cout << cnt1;
+	Table<int, int> a(3);
+	Iterator<int, int> b(make_pair(0, 0));
+	int cnt = 0;
+	
+	for (auto i = a.begin(); i != a.end(); ++i) {
+		cnt++;
+	}
+	cout << cnt<<"\n";
+	
+	/*SortTable<int, int> s(3);
+	int cnt1 = 0;
+	for (auto i = s.begin(); i != s.end(); ++i) {
+		cnt1++;
+	}
+	cout << cnt1;*/
 
 	//Table<int, int> a;
 	//for (int i = 0; i < 5; i++) {
@@ -35,7 +35,7 @@ int main() {
 	//		cout << "yes";
 	//}
 
-	vector<int> key = { 2,5,3,6,4 };
+	/*vector<int> key = { 2,5,3,6,4 };
 	vector<int> data = { 1,2,3,4,5 };
 	Table<int, int> a;
 	for (int i = 0; i < 5; i++) {
@@ -46,5 +46,5 @@ int main() {
 		cout << 1;
 	else cout << 0;
 
-	return 0;
+	return 0;*/
 }

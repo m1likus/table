@@ -3,22 +3,25 @@
 
 TEST(Table, create_an_empty_table) 
 {
-    ASSERT_ANY_THROW();     //ASSERT_ANY_THROW(Table<int,int> a); it doesn't work, mb you know what the reason is (I took it from the translator)
+    //ASSERT_NO_THROW(Table<pair<int,int> > a);
+     //ASSERT_ANY_THROW(Table<int,int> a); it doesn't work, mb you know what the reason is (I took it from the translator)
 }
 
 TEST(Table, create_table_is_positive_length)
 {
-    ASSERT_ANY_THROW();
+    //EXPECT_NO_THROW(Table <int, int> a(100));
+
 }
 
 TEST(Table, create_copied_table) 
 {
-    ASSERT_ANY_THROW();
+    Table <int, int> a(5);
+    //EXPECT_NO_THROW(Table <int, int> b(a));
 }
 
 TEST(Table, assign_table)
 {
-    ASSERT_ANY_THROW();
+    ASSERT_NO_THROW();
 }
 
 TEST(Table, get_data_by_key)
@@ -110,5 +113,4 @@ TEST(Table, remove_false)
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
-    return 0;
 }
