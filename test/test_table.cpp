@@ -3,7 +3,7 @@
 
 TEST(Table, create_an_empty_table) 
 {
-    //ASSERT_NO_THROW(Table<pair<int,int> > a);
+    //EXPECT_NO_THROW(Table<int,int> a);
      //ASSERT_ANY_THROW(Table<int,int> a); it doesn't work, mb you know what the reason is (I took it from the translator)
 }
 
@@ -104,6 +104,17 @@ TEST(Table, remove_false)
     a.insert(key, data);
     bool x = a.remove(key+1);
     EXPECT_EQ(x, false);
+}
+
+TEST(SortTable, insert) {
+    SortTable <int, int> a;
+    a.insert(1,1);
+    a.insert(7, 7);
+    a.insert(3, 3);
+    a.insert(6, 6);
+    a.insert(10, 10);
+
+    EXPECT_EQ(a.insert(5, 5), 3);
 }
 
 

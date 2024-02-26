@@ -56,7 +56,7 @@ public:
 		return end(); //иначе возвращаем итератор на конец
 	}
 //--------------------------------------------------------------------------------//
-	Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data) {
+	virtual Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data) {
 		//...
 		int i = storage.size();
 		storage.push_back(make_pair(key, data));
@@ -139,10 +139,18 @@ public:
 template<typename TypeKey, typename TypeData>
 class SortTable : public Table<TypeKey, TypeData> {
 public:
-	SortTable(int s) :Table<TypeKey, TypeData>(s){
-	}
-	Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data) {
+	SortTable(int s): Table<TypeKey, TypeData>(s){}
+	SortTable() : Table<TypeKey, TypeData>{}
+	Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data)  {
 		//...
-		
+		storage.push_back(make_pair(key, data));
+		for (int i = storage.size() - 1; i > 1; i++) {
+			if (storage[i - 1].first < storage[i].first)
+				swap(storage[i - 1], storage[i]);
+			else return Table<TypeKey, TypeData>::storage.begin() + i;
+		}
 	}
+	//TypeData& operator[] (TypeKey& key) {
+	//	Table::storage[key];
+	//}
 };
