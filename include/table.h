@@ -30,13 +30,13 @@ public:
 	}
 //--------------------------------------------------------------------------------//
 	Table& operator=(const Table& other) { //оператор присваивания
-		if (this == other)
+		if (this == &other)
 			return *this;
 		storage = other.storage;
-		return this*;
+		return *this;
 	}
 //--------------------------------------------------------------------------------//
-	TypeData& operator[] (TypeKey& key) { //оператор []
+	virtual TypeData& operator[] (const TypeKey& key) { //оператор []
 		for (int i = 0; i < storage.size(); i++) {
 			if (storage[i].first == key) //если нашли ключ
 				return storage[i].second; //возвращаем данные
@@ -55,11 +55,15 @@ public:
 		}
 		return end(); //иначе возвращаем итератор на конец
 	}
+	int size() {
+		return storage.size();
+	}
 //--------------------------------------------------------------------------------//
 	virtual Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data) {
 		//...
 		int i = storage.size();
 		storage.push_back(make_pair(key, data));
+		i--;
 		return begin() + i;
 	}
 //--------------------------------------------------------------------------------//
@@ -87,70 +91,83 @@ public:
 //--------------------------------------------------------------------------------//
 };
 
+
+
+template<typename TypeKey, typename TypeData>
+class SortTable : public Table<TypeKey, TypeData> {
+public:
+	SortTable(){}
+	SortTable(int s): Table<TypeKey, TypeData>(s){}
+	Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data)  {
+		//...
+		for (int i = 0; i < storage.size(); i++) {
+			if (storage[i].first > key) {
+				storage.insert(storage.begin() + i, make_pair(key, data));
+				return Table<TypeKey, TypeData>::begin() + i;
+			}
+		}
+		int x = storage.size();
+		storage.insert(storage.begin() + x, make_pair(key, data));
+		return Table<TypeKey, TypeData>::begin() + x;
+	}
+	TypeData& operator[] (const TypeKey& key) { //оператор []
+		for (int i = 0; i < storage.size(); i++) {
+			if (storage[i].first == key) //если нашли ключ
+				return storage[i].second; //возвращаем данные
+		}
+		//если нет, то создаем данные с таким ключом
+		insert(key, TypeData());
+		//и возвращаем их
+		return *find(key);
+	}
+};
+
+
 template<typename TypeKey, typename T>
 class Iterator {
 	friend class Table< TypeKey, T>; //https://ru.cppreference.com/w/cpp/language/friend
 protected:
 	pair<TypeKey, T>* iterator;
 public:
-//--------------------------------------------------------------------------------//
+	//--------------------------------------------------------------------------------//
 	Iterator(pair<TypeKey, T>& data) { //конструктор с параметрами
 		iterator = &data;
 	}
-//--------------------------------------------------------------------------------//
+	//--------------------------------------------------------------------------------//
 	Iterator(const Iterator& other) { //конструктор копирования
 		iterator = other.iterator;
 	}
-//---------------------------------------------------------------------//
+	//---------------------------------------------------------------------//
 	T& operator*() const { //получение элемента, на который указывает итератор
 		return iterator->second;
 	}
-//--------------------------------------------------------------------------------//
+	//--------------------------------------------------------------------------------//
 	T* operator->() const { //->
 		return iterator.second;
 	}
-//--------------------------------------------------------------------------------//
+	//--------------------------------------------------------------------------------//
 	Iterator& operator++() {
 		iterator++;
 		return *this;
 	}
-//--------------------------------------------------------------------------------//
-	Iterator& operator--() { 
+	//--------------------------------------------------------------------------------//
+	Iterator& operator--() {
 		iterator--;
 		return *this;
 	}
-//--------------------------------------------------------------------------------//
+	//--------------------------------------------------------------------------------//
 	Iterator operator+(int offset) { //смещение
 		Iterator<TypeKey, T> tmp = *this;
 		tmp.iterator += offset;
 		return tmp;
 	}
-//--------------------------------------------------------------------------------//
+	//--------------------------------------------------------------------------------//
 	bool operator==(const Iterator& other) {
 		return iterator == other.iterator;
 	}
-//--------------------------------------------------------------------------------//
+	//--------------------------------------------------------------------------------//
 	bool operator!=(const Iterator& other) {
 		return iterator != other.iterator;
 	}
-//--------------------------------------------------------------------------------//
-};
-
-template<typename TypeKey, typename TypeData>
-class SortTable : public Table<TypeKey, TypeData> {
-public:
-	SortTable(int s): Table<TypeKey, TypeData>(s){}
-	SortTable() : Table<TypeKey, TypeData>{}
-	Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data)  {
-		//...
-		storage.push_back(make_pair(key, data));
-		for (int i = storage.size() - 1; i > 1; i++) {
-			if (storage[i - 1].first < storage[i].first)
-				swap(storage[i - 1], storage[i]);
-			else return Table<TypeKey, TypeData>::storage.begin() + i;
-		}
-	}
-	//TypeData& operator[] (TypeKey& key) {
-	//	Table::storage[key];
-	//}
+	//--------------------------------------------------------------------------------//
 };
