@@ -1,5 +1,7 @@
 #include <gtest.h>
 #include "table.h"
+#include "sortTable.h"
+#include "hashTable.h"
 
 TEST(Table, create_an_empty_table) 
 {

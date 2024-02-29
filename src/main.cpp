@@ -1,17 +1,26 @@
 #include <iostream>
 #include "table.h"
+#include "hashTable.h"
+#include "sortTable.h"
+#include <string>
 using namespace std;
 
+
+
+
 int main() {
-	Table<int, int> a(3);
-	Iterator<int, int> b(make_pair(0, 0));
-	int cnt = 0;
-	
-	for (auto i = a.begin(); i != a.end(); ++i) {
-		cnt++;
-	}
-	cout << cnt<<"\n";
-	
+	HashTable<string, int> a(50000);
+	a.insert("apple", 123);
+	a.insert("mango", 432);
+	a.insert("banana", 213);
+	a.insert("guava", 654);//example https://codechick.io/tutorials/dsa/dsa-hash-table
+	a.insert("orange", 345);
+
+	cout << a["apple"]<<"\n";
+	cout << a["mango"]<<"\n";
+	cout << a["banana"]<<"\n";
+	cout << a["guava"]<<"\n";
+	cout << a["orange"]<<"\n";
 	/*SortTable<int, int> s(3);
 	int cnt1 = 0;
 	for (auto i = s.begin(); i != s.end(); ++i) {
