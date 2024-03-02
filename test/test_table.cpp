@@ -220,6 +220,84 @@ TEST(SortTable, remove_false)
     EXPECT_EQ(x, false);
 }
 
+TEST(HashTable, create_table_is_positive_length)
+{
+    int s = 100;
+    HashTable<string, int> a(s);
+    EXPECT_EQ(a.size(), s);
+}
+
+TEST(HashTable, create_copied_table)
+{
+    int s = 100;
+    HashTable<string, int> a(s);
+
+    HashTable<string, int> b = a;
+    EXPECT_EQ(a.size(), b.size());
+}
+
+TEST(HashTable, assign_table)
+{
+    int s1 = 5;
+    int s2 = 100;
+    HashTable<string, int> a(s1);
+    HashTable<string, int> b(s2);
+
+    b = a;
+    EXPECT_EQ(a.size(), b.size());
+}
+
+
+TEST(HashTable, get_data_by_key)
+{
+    int data = 10;
+    HashTable<string, int> a(100);
+    a.insert("key", data);
+    a.insert("key + 1", data + 1);
+    a.insert("key - 1", data - 1);
+
+    EXPECT_EQ(a["key"], data);
+}
+
+TEST(HashTable, insert) {
+    HashTable <string, int> a(100);
+    a.insert("1", 1);
+    a.insert("7", 7);
+    a.insert("3", 3);
+    a.insert("6", 6);
+    a.insert("10", 10);
+    EXPECT_EQ(*a.insert("3", 3), 3);
+}
+
+TEST(HashTable, find_by_an_existing_key)
+{
+    HashTable <string, int> a(100);
+    a.insert("1", 1);
+    a.insert("7", 7);
+    a.insert("3", 3);
+    a.insert("6", 6);
+    a.insert("10", 10);
+    EXPECT_EQ(3, *a.find("3"));
+}
+
+TEST(HashTable, remove_true)
+{
+    int data = 10;
+    HashTable<string, int> a(100);
+    a.insert("key", data);
+    bool x = a.remove("key");
+    EXPECT_EQ(x, true);
+}
+
+TEST(HashTable, remove_false)
+{
+    int key = 4;
+    int data = 10;
+    HashTable<string, int> a(100);
+    a.insert("key", data);
+    bool x = a.remove("key + 1");
+    EXPECT_EQ(x, false);
+}
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);

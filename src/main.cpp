@@ -2,6 +2,7 @@
 #include "table.h"
 #include "hashTable.h"
 #include "sortTable.h"
+#include "binTreeTable.h"
 #include <string>
 using namespace std;
 
