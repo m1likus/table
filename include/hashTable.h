@@ -1,75 +1,86 @@
+#pragma once
+
 #include <string>
+#include "table.h"
 
 template<typename TypeKey,typename TypeData>
-class HashTable : public Table<TypeKey, TypeData> {
-private:
-	int HashFunction(TypeKey key) {
-		if (typeid(TypeKey) == typeid(string)) {
-			int index = 0;
-			int p_step = storage.size() - 1;
-			int p = p_step;
-			for (int i = 0; i < key.size(); i++) {
-				index += key[i] * p;
-				p *= p_step;
-			}
-			return index % storage.size();
+class HashTable : public baseTable<TypeKey, TypeData> {
+protected:
+	vector<vector<pair<TypeKey, TypeData>>> storage;
+
+	int HashFunction(std::string key) {
+		int index = 0;
+		int p_step = 2;
+		int p = p_step;
+		for (int i = 0; i < key.size(); i++) {
+			index += key[i] * p;
+			p *= p_step;
 		}
+		return index % 1001;
+	}
+	int HashFunction(int key) {
+		return key;
 	}
 
-	int HashFunctionStep(TypeKey key) {
-		//int index = 0;
-		//for (int i = 0; i < key.size(); i++) {
-		//	index += key[i];
-		//}
-		//return index;
-		return storage.size()-1;
-	}
 public:
-	HashTable(int size) : Table<TypeKey, TypeData>(size) {}
+	HashTable(int size) {
+		storage = vector<vector<pair<TypeKey, TypeData>>>(size);
+	}
 	Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data) {
 		//...
-		int index = HashFunction(key);
-		int step = HashFunctionStep(key);
-		while (storage[index].first != "" && storage[index].first != key)
-			index = (index + step) % storage.size();
-		if (storage[index].first == "")
-			storage[index] = make_pair(key, data);
-		else if (storage[index].first == key) {
-			storage[index].second = data;
+		int index = HashFunction(key)%storage.size();
+		for (int i = 0; i < storage[index].size(); i++) {
+			if (storage[index][i].first == key) {
+				storage[index][i].second = data;
+				return Iterator<TypeKey, TypeData>(storage[index][i]);
+			}
 		}
-		return Table<TypeKey, TypeData>::begin() + index;
+		storage[index].push_back(make_pair(key, data));
+		return Iterator<TypeKey, TypeData>(storage[index].back());
 	}
 	TypeData& operator[] (const TypeKey& key) { //оператор []
-		int index = HashFunction(key);
-		int step = HashFunctionStep(key);
-		while(storage[index].first!=key)
-			index = (index + step) % storage.size();		
-		return storage[index].second;
+		int index = HashFunction(key)%storage.size(); 
+		for (int i = 0; i < storage[index].size(); i++) {
+			if (storage[index][i].first == key) {
+				return storage[index][i].second;
+			}
+		}
+		storage[index].push_back(make_pair(key, TypeData()));
+		return storage[index].back().second;
 	}
 	Iterator<TypeKey, TypeData> find(const TypeKey& key) {
-		int index = HashFunction(key);
-		int step = HashFunctionStep(key);
+		int index = HashFunction(key)%storage.size();
 		int it = 0;
-		while (storage[index].first != key && it < storage.size()) {
-			index = (index + step) % storage.size();
-			it++;
+		for (int i = 0; i < storage[index].size(); i++) {
+			if (storage[index][i].first == key) {
+				return Iterator<TypeKey, TypeData>(storage[index][i]);
+			}
 		}
-		if(it < storage.size())
-			return Table<TypeKey, TypeData>::begin() + index;
-		return Table<TypeKey, TypeData>::end(); //иначе возвращаем итератор на конец
+		return end(); //иначе возвращаем итератор на конец
 	}
 	bool remove(const TypeKey& key) {
-		int index = HashFunction(key);
-		int step = HashFunctionStep(key);
-		int it = 0;
-		while (storage[index].first != key && it < storage.size()) {
-			index = (index + step) % storage.size();
-			it++;
-		}
-		if (it < storage.size()) {
-			storage[index] = make_pair(NULL, NULL);
-			return true;
+		int index = HashFunction(key) % storage.size();
+		for (int i = 0; i < storage[index].size(); i++) {
+			if (storage[index][i].first == key) {
+				storage[index].erase(storage[index].begin() + i);
+				return true;
+			}
 		}
 		return false;
 	}
+	int size() {
+		return storage.size();
+	}
+	//--------------------------------------------------------------------------------//
+	//итератор на начало
+	Iterator<TypeKey, TypeData> begin() {
+		return Iterator<TypeKey, TypeData>(storage[0][0]);
+	}
+	//--------------------------------------------------------------------------------//
+		//итератор на конец
+	Iterator<TypeKey, TypeData> end() {
+		Iterator<TypeKey, TypeData> a = begin();
+		return a + storage.size();
+	}
+	//--------------------------------------------------------------------------------//
 };

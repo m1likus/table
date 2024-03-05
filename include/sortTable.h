@@ -1,3 +1,6 @@
+#pragma once
+
+#include "table.h"
 
 template<typename TypeKey, typename TypeData>
 class SortTable : public Table<TypeKey, TypeData> {

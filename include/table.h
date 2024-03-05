@@ -1,13 +1,46 @@
+#pragma once
+
 #include <iostream>
 #include <algorithm>
 #include <vector>
 using namespace std;
 
+//template<typename TypeKey, typename T>
+//class baseIterator { //объявление класса итератора
+//public:
+//	virtual T& operator*() const = 0;
+//	//--------------------------------------------------------------------------------//
+//	virtual T* operator->() const = 0 //->
+//		//--------------------------------------------------------------------------------//
+//	virtual Iterator & operator++() = 0;
+//	//--------------------------------------------------------------------------------//
+//	virtual Iterator& operator--() = 0;
+//	//--------------------------------------------------------------------------------//
+//	virtual Iterator operator+(int offset) = 0;//смещение
+//	//--------------------------------------------------------------------------------//
+//	virtual bool operator==(const Iterator& other) = 0;
+//	//--------------------------------------------------------------------------------//
+//	virtual bool operator!=(const Iterator& other) = 0;
+//	//--------------------------------------------------------------------------------//
+//
+//};
+
 template<typename TypeKey, typename T>
 class Iterator; //объявление класса итератора
 
+
 template <typename TypeKey, typename TypeData>
-class Table {
+class baseTable {
+public:
+	virtual Iterator<TypeKey, TypeData> find(const TypeKey& key)=0;
+	virtual Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data)=0;
+	virtual bool remove(const TypeKey& key)=0;
+	virtual Iterator<TypeKey, TypeData> begin()=0;
+	virtual Iterator<TypeKey, TypeData> end()=0;
+	virtual int size() = 0;
+};
+template <typename TypeKey, typename TypeData>
+class Table : public baseTable<TypeKey,TypeData>{
 protected:
 	vector <pair<TypeKey, TypeData>> storage;
 public:
@@ -24,7 +57,7 @@ public:
 		storage = other.storage;
 	}
 //--------------------------------------------------------------------------------//
-	~Table() { //деструктор
+	virtual ~Table() { //деструктор
 		storage=vector<pair<TypeKey, TypeData>>(0);
 	}
 //--------------------------------------------------------------------------------//
@@ -47,7 +80,7 @@ public:
 	}
 //--------------------------------------------------------------------------------//
 	//возвращаемое значение - ссылка на итератор на найденный элемент
-	virtual Iterator<TypeKey, TypeData> find(const TypeKey& key) { 
+	Iterator<TypeKey, TypeData> find(const TypeKey& key) { 
 		for (int i = 0; i < storage.size(); i++) {
 			if (storage[i].first == key) //нашли ключ
 				return begin() + i; //возвращаем ссылку на итератор
@@ -58,7 +91,7 @@ public:
 		return storage.size();
 	}
 //--------------------------------------------------------------------------------//
-	virtual Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data) {
+	Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data) {
 		//...
 		int i = storage.size();
 		storage.push_back(make_pair(key, data));
@@ -67,7 +100,7 @@ public:
 	}
 //--------------------------------------------------------------------------------//
 	//возвращаем true/false
-	virtual bool remove(const TypeKey& key) {
+	bool remove(const TypeKey& key) {
 		for (int i = 0; i < storage.size(); i++) {
 			if (storage[i].first == key) { //нашли 
 				storage.erase(storage.begin()+i); //убрали
@@ -91,7 +124,7 @@ public:
 };
 
 template<typename TypeKey, typename T>
-class Iterator {
+class Iterator{
 	friend class Table< TypeKey, T>; //https://ru.cppreference.com/w/cpp/language/friend
 protected:
 	pair<TypeKey, T>* iterator;

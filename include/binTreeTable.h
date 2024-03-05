@@ -1,3 +1,7 @@
+#pragma once
+
+#include "table.h"
+
 template <typename TypeKey, typename TypeData>
 class Node {
 	TypeData data;
@@ -19,9 +23,9 @@ class Node {
 };
 
 template <typename TypeKey, typename TypeData>
-class binTreeTable {
+class binTreeTable : public baseTable<TypeKey,TypeData> {
 protected:
-	Node* begin = NULL;
+	Node<TypeKey,TypeData>* begin = NULL;
 public:
 	//--------------------------------------------------------------------------------//
 	binTreeTable() { //конструктор по умолчанию
@@ -54,9 +58,6 @@ public:
 				n1 = n1.left;
 		}
 		return n1;
-	}
-	int size() {
-		
 	}
 	//--------------------------------------------------------------------------------//
 	Iterator<TypeKey, TypeData> insert(const TypeKey& k, const TypeData& d) {
@@ -103,10 +104,13 @@ public:
 			return true;//недописал
 		}
 	}
+	int size() {
+		return 0;
+	}
 	//--------------------------------------------------------------------------------//
 		//итератор на начало
 	Iterator<TypeKey, TypeData> begin() {
-		return Iterator<TypeKey, TypeData>(storage[0]);
+		return Iterator<TypeKey, TypeData>(make_pair(0,0));
 	}
 	//--------------------------------------------------------------------------------//
 		//итератор на конец

@@ -2,6 +2,7 @@
 #include "table.h"
 #include "sortTable.h"
 #include "hashTable.h"
+//#include "binTreeTable.h"
 
 TEST(Table, create_an_empty_table) 
 {
@@ -297,6 +298,13 @@ TEST(HashTable, remove_false)
     a.insert("key", data);
     bool x = a.remove("key + 1");
     EXPECT_EQ(x, false);
+}
+
+TEST(HashTable, create_table_int_int_is_positive_length)
+{
+    int s = 100;
+    HashTable<int, int> a(s);
+    EXPECT_EQ(a.size(), s);
 }
 
 int main(int argc, char** argv) {
