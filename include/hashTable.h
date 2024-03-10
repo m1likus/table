@@ -39,6 +39,10 @@ protected:
 		return (HashFunction(p));
 	}
 //--------------------------------------------------------------------------------//
+	Iterator<TypeKey, TypeData>& operator++() {
+
+		return Iterator<TypeKey, TypeData>::iterator;
+	}
 public:
 	HashTable(int size) {
 		storage = vector<vector<pair<TypeKey, TypeData>>>(size);
@@ -92,17 +96,33 @@ public:
 		return storage.size();
 	}
 //--------------------------------------------------------------------------------//
+	int sizeoftable() {
+		int sum = 0;
+		for (int i = 0; i < size(); i++) {
+			sum += storage[i].size();
+		}
+		return sum;
+	}
+//--------------------------------------------------------------------------------//
 	//итератор на начало
-	//Iterator<TypeKey, TypeData> begin() {
-	//	//TODO
-	//}
+	Iterator<TypeKey, TypeData> begin() {
+		if (storage.empty()) return (storage[0][0] + sizeoftable());
+		for (int i = 0; i < storage.size(); i++) {
+			if (!storage[i].empty()) {
+				return Iterator::iterator(storage[i].begin());
+			}
+		}
+	}
 //--------------------------------------------------------------------------------//
 	//итератор на конец
-	//Iterator<TypeKey, TypeData> end() {
-	//	//TODO
-	//}
-//--------------------------------------------------------------------------------//
-	Iterator<TypeKey, TypeData>& operator++(){
-		return Iterator<TypeKey, TypeData>::iterator;
+	Iterator<TypeKey, TypeData> end() {
+		if (storage.empty()) return (storage[0][0] + sizeoftable());
+		for (int i = storage.size(); i > 0; i--) {
+			if (!storage[i].empty()) {
+				return Iterator::iterator(storage[i].end());
+			}
+		}
 	}
+//--------------------------------------------------------------------------------//
+	
 };
