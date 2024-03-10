@@ -74,14 +74,12 @@ public:
 	}
 //--------------------------------------------------------------------------------//
 	Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data) {
-		//...
 		int i = storage.size();
 		storage.push_back(make_pair(key, data));
 		i--;
 		return begin() + i;
 	}
 //--------------------------------------------------------------------------------//
-	//возвращаем true/false
 	bool remove(const TypeKey& key) {
 		for (int i = 0; i < storage.size(); i++) {
 			if (storage[i].first == key) { //нашли 
