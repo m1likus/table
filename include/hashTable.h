@@ -4,8 +4,6 @@
 #include "table.h"
 #include <math.h>
 
-template<typename TypeKey, typename T>
-class hashIterator; //объявление итератора для hashTable
 
 template<typename TypeKey,typename TypeData>
 class HashTable : public baseTable<TypeKey, TypeData> {
@@ -46,16 +44,16 @@ public:
 		storage = vector<vector<pair<TypeKey, TypeData>>>(size);
 	}
 //--------------------------------------------------------------------------------//
-	hashIterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data) {
+	Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data) {
 		int index = HashFunction(key)%storage.size();
 		for (int i = 0; i < storage[index].size(); i++) {
 			if (storage[index][i].first == key) {
 				storage[index][i].second = data;
-				return hashIterator<TypeKey, TypeData>(storage[index][i]);
+				return Iterator<TypeKey, TypeData>(storage[index][i]);
 			}
 		}
 		storage[index].push_back(make_pair(key, data));
-		return hashIterator<TypeKey, TypeData>(storage[index].back());
+		return Iterator<TypeKey, TypeData>(storage[index].back());
 	}
 //--------------------------------------------------------------------------------//
 	TypeData& operator[] (const TypeKey& key) { //оператор []
@@ -69,11 +67,11 @@ public:
 		return storage[index].back().second;
 	}
 //--------------------------------------------------------------------------------//
-	hashIterator<TypeKey, TypeData> find(const TypeKey& key) {
+	Iterator<TypeKey, TypeData> find(const TypeKey& key) {
 		int index = HashFunction(key)%storage.size();
 		for (int i = 0; i < storage[index].size(); i++) {
 			if (storage[index][i].first == key) {
-				return hashIterator<TypeKey, TypeData>(storage[index][i]);
+				return Iterator<TypeKey, TypeData>(storage[index][i]);
 			}
 		}
 		return end(); 
@@ -95,39 +93,16 @@ public:
 	}
 //--------------------------------------------------------------------------------//
 	//итератор на начало
-	hashIterator<TypeKey, TypeData> begin() {
-		//TODO
-	}
+	//Iterator<TypeKey, TypeData> begin() {
+	//	//TODO
+	//}
 //--------------------------------------------------------------------------------//
 	//итератор на конец
-	hashIterator<TypeKey, TypeData> end() {
-		//TODO
-	}
+	//Iterator<TypeKey, TypeData> end() {
+	//	//TODO
+	//}
 //--------------------------------------------------------------------------------//
-};
-
-template<typename TypeKey, typename T>
-class hashIterator : public Iterator<TypeKey,T> {
-	friend class HashTable<TypeKey, T>;
-protected: 
-	pair<TypeKey, T>* iterator;
-public:
-	hashIterator(pair<TypeKey, T>& data) {
-		iterator = &data;
+	Iterator<TypeKey, TypeData>& operator++(){
+		return Iterator<TypeKey, TypeData>::iterator;
 	}
-	hashIterator(const hashIterator& other) { 
-		iterator = other.iterator;
-	}
-	T& operator*() const override { 
-		return iterator->second;
-	}
-	T* operator->() const override { 
-		return iterator.second;
-	}
-	hashIterator& operator++() {
-		//TODO
-	}
-
-
-
 };

@@ -120,15 +120,15 @@ public:
 		iterator = other.iterator;
 	}
 //---------------------------------------------------------------------//
-	virtual T& operator*() const { //получение элемента, на который указывает итератор
+	T& operator*() const { //получение элемента, на который указывает итератор
 		return iterator->second;
 	}
 //--------------------------------------------------------------------------------//
-	virtual T* operator->() const { //->
+	T* operator->() const { //->
 		return iterator.second;
 	}
 //--------------------------------------------------------------------------------//
-	Iterator& operator++() {
+	virtual Iterator& operator++() {
 		iterator++;
 		return *this;
 	}

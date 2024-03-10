@@ -10,18 +10,18 @@ using namespace std;
 
 
 int main() {
-	HashTable<string, int> a(50000);
-	a.insert("apple", 123);
-	a.insert("mango", 432);
-	a.insert("banana", 213);
-	a.insert("guava", 654);//example https://codechick.io/tutorials/dsa/dsa-hash-table
-	a.insert("orange", 345);
+	//HashTable<string, int> a(50000);
+	//a.insert("apple", 123);
+	//a.insert("mango", 432);
+	//a.insert("banana", 213);
+	//a.insert("guava", 654);//example https://codechick.io/tutorials/dsa/dsa-hash-table
+	//a.insert("orange", 345);
 
-	cout << a["apple"]<<"\n";
-	cout << a["mango"]<<"\n";
-	cout << a["banana"]<<"\n";
-	cout << a["guava"]<<"\n";
-	cout << a["orange"]<<"\n";
+	//cout << a["apple"]<<"\n";
+	//cout << a["mango"]<<"\n";
+	//cout << a["banana"]<<"\n";
+	//cout << a["guava"]<<"\n";
+	//cout << a["orange"]<<"\n";
 	/*SortTable<int, int> s(3);
 	int cnt1 = 0;
 	for (auto i = s.begin(); i != s.end(); ++i) {
