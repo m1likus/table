@@ -249,7 +249,7 @@ TEST(HashTable, assign_table)
 }
 
 
-TEST(HashTable, get_data_by_key)
+TEST(HashTable, get_data_by_key_string)
 {
     int data = 10;
     HashTable<string, int> a(100);
@@ -258,6 +258,42 @@ TEST(HashTable, get_data_by_key)
     a.insert("key - 1", data - 1);
 
     EXPECT_EQ(a["key"], data);
+}
+
+TEST(HashTable, get_data_by_key_int)
+{
+    int data = 10;
+    int key = 25;
+    HashTable<int, int> a(100);
+    a.insert(key, data);
+    a.insert(key + 20, data + 1);
+    a.insert(key - 20, data - 1);
+
+    EXPECT_EQ(a[key], data);
+}
+
+TEST(HashTable, get_data_by_key_float)
+{
+    int data = 10;
+    int key = 25.234;
+    HashTable<float, int> a(100);
+    a.insert(key, data);
+    a.insert(key + 20.345, data + 1);
+    a.insert(key - 20.345, data - 1);
+
+    EXPECT_EQ(a[key], data);
+}
+
+TEST(HashTable, get_data_by_key_double)
+{
+    int data = 10;
+    int key = 25.234;
+    HashTable<double, int> a(100);
+    a.insert(key, data);
+    a.insert(key + 20.345, data + 1);
+    a.insert(key - 20.345, data - 1);
+
+    EXPECT_EQ(a[key], data);
 }
 
 TEST(HashTable, insert) {

@@ -10,6 +10,10 @@ using namespace std;
 
 
 int main() {
+	{
+		Table<int, int> a(10);
+	}
+	
 	//HashTable<string, int> a(50000);
 	//a.insert("apple", 123);
 	//a.insert("mango", 432);
