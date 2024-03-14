@@ -11,7 +11,18 @@ using namespace std;
 
 int main() {
 	{
-		Table<int, int> a(10);
+		BinTreeTable<int, int> a;
+		a.insert(2, 2);
+		a.insert(1, 1);
+		a.insert(4, 4);
+		a.insert(3, 3);
+		a.insert(5, 5);
+		a.insert(6, 6);
+		a.remove(4);
+		a.insert(0, 0);
+		a.insert(4, 4);
+
+		cout << a[4];
 	}
 	
 	//HashTable<string, int> a(50000);
