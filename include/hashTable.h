@@ -15,10 +15,14 @@ protected:
 	int q = 3011;
 	//--------------------------------------------------------------------------------//
 	double calculateAverageCollisions() {
-		return 1;
+		double ans = 0;
+		for (int i = 0; i < size(); i++) {
+			ans = (ans + storage[i].size())/2;
+		}
+		return ans;
 	}
 	double calculatePercentageFilling() {
-		return 1;
+		int elements = 0;
 	}
 	bool check() {
 		return 1;
