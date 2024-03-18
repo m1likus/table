@@ -9,7 +9,23 @@ template<typename TypeKey,typename TypeData>
 class HashTable {
 protected:
 	vector<vector<pair<TypeKey, TypeData>>> storage;
+	double averageCollisions = 0;
+	double percentageFilling = 0;
+	int p = 3001;
+	int q = 3011;
 	//--------------------------------------------------------------------------------//
+	double calculateAverageCollisions() {
+		return 1;
+	}
+	double calculatePercentageFilling() {
+		return 1;
+	}
+	bool check() {
+		return 1;
+	}
+	void rebalancing(int offset) {
+
+	}
 	int HashFunction(std::string key) { //хэш-функция для string
 		int pos = 0;
 		int p_step = 2;
