@@ -22,6 +22,18 @@ protected:
 		return (pos % q);
 	}
 	//--------------------------------------------------------------------------------//
+	int HashFunction(std::vector<int> key) { //хэш-функция для string
+		int pos = 0;
+		int p_step = 2;
+		int p = p_step;
+		for (int i = 0; i < key.size(); i++) {
+			pos += key[i] * p; // a1*p+a2*p^2+...+a(n-1)*p^(n-1)
+			p *= p_step;
+		}
+		int q = 1009;
+		return (pos % q);
+	}
+	//--------------------------------------------------------------------------------//
 	int HashFunction(int key) { // хэш-функция для int
 		int p1 = 7193, p2 = 1213;
 		return (p1 * key) % p2;

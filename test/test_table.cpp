@@ -296,6 +296,21 @@ TEST(HashTable, get_data_by_key_double)
     EXPECT_EQ(a[key], data);
 }
 
+TEST(HashTable, get_data_by_key_vector)
+{
+    int data = 10;
+    vector<int> key1 = { 1,2,3,4,5 };
+    vector<int> key2 = { 4,2,4,7,8 };
+    vector<int> key3 = { 6,4,6,9,7 };
+
+    HashTable<vector<int>, int> a(100);
+    a.insert(key1, data);
+    a.insert(key2, data + 1);
+    a.insert(key3, data - 1);
+
+    EXPECT_EQ(a[key1], data);
+}
+
 TEST(HashTable, insert) {
     HashTable <string, int> a(100);
     a.insert("1", 1);
