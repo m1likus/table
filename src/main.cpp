@@ -1,8 +1,8 @@
 #include <iostream>
 #include "table.h"
-#include "hashTable.h"
-#include "sortTable.h"
-#include "binTreeTable.h"
+//#include "hashTable.h"
+//#include "sortTable.h"
+//#include "binTreeTable.h"
 #include <string>
 using namespace std;
 
@@ -11,19 +11,25 @@ using namespace std;
 
 int main() {
 	{
-		BinTreeTable<int, int> a;
-		a.insert(2, 2);
-		a.insert(1, 1);
-		a.insert(4, 4);
-		a.insert(3, 3);
-		a.insert(5, 5);
-		a.insert(6, 6);
-		a.remove(4);
-		a.insert(0, 0);
-		a.insert(4, 4);
-
-		cout << a[4];
+		pair<int, int> p = make_pair(1, 2);
+		Iterator<int, int>* it = new TableIterator<int, int>(p);
+		it++;
+		
+		return 0;
 	}
+	
+	//BinTreeTable<int, int> a;
+	//a.insert(2, 2);
+	//a.insert(1, 1);
+	//a.insert(4, 4);
+	//a.insert(3, 3);
+	//a.insert(5, 5);
+	//a.insert(6, 6);
+	//a.remove(4);
+	//a.insert(0, 0);
+	//a.insert(4, 4);
+	//
+	//cout << a[4];
 	
 	//HashTable<string, int> a(50000);
 	//a.insert("apple", 123);

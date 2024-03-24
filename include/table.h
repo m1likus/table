@@ -3,6 +3,7 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include "iterator.hpp"
 using namespace std;
 
 
@@ -77,7 +78,7 @@ public:
 		int i = storage.size();
 		storage.push_back(make_pair(key, data));
 		i--;
-		return begin() + i;
+		return it;
 	}
 //--------------------------------------------------------------------------------//
 	bool remove(const TypeKey& key) {
@@ -92,62 +93,14 @@ public:
 //--------------------------------------------------------------------------------//
 	//итератор на начало
 	Iterator<TypeKey, TypeData> begin() {
-		return Iterator<TypeKey, TypeData>(storage[0]);
+		Iterator<TypeKey, TypeData> *a = new TableIterator<TypeKey, TypeData>(storage[0]);
+		return a*;
 	}
 //--------------------------------------------------------------------------------//
 	//итератор на конец
 	Iterator<TypeKey, TypeData> end() {
 		Iterator<TypeKey, TypeData> a = begin();
 		return a + storage.size();
-	}
-//--------------------------------------------------------------------------------//
-};
-
-template<typename TypeKey, typename T>
-class Iterator {
-	friend class Table< TypeKey, T>; //https://ru.cppreference.com/w/cpp/language/friend
-protected:
-	pair<TypeKey, T>* iterator;
-public:
-//--------------------------------------------------------------------------------//
-	Iterator(pair<TypeKey, T>& data) { //конструктор с параметрами
-		iterator = &data;
-	}
-//--------------------------------------------------------------------------------//
-	Iterator(const Iterator& other) { //конструктор копирования
-		iterator = other.iterator;
-	}
-//---------------------------------------------------------------------//
-	T& operator*() const { //получение элемента, на который указывает итератор
-		return iterator->second;
-	}
-//--------------------------------------------------------------------------------//
-	T* operator->() const { //->
-		return iterator.second;
-	}
-//--------------------------------------------------------------------------------//
-	virtual Iterator& operator++() {
-		iterator++;
-		return *this;
-	}
-//--------------------------------------------------------------------------------//
-	Iterator& operator--() {
-		iterator--;
-		return *this;
-	}
-//--------------------------------------------------------------------------------//
-	Iterator operator+(int offset) { //смещение
-		Iterator<TypeKey, T> tmp = *this;
-		tmp.iterator += offset;
-		return tmp;
-	}
-//--------------------------------------------------------------------------------//
-	bool operator==(const Iterator& other) {
-		return iterator == other.iterator;
-	}
-//--------------------------------------------------------------------------------//
-	bool operator!=(const Iterator& other) {
-		return iterator != other.iterator;
 	}
 //--------------------------------------------------------------------------------//
 };
