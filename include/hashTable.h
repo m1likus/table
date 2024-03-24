@@ -24,16 +24,16 @@ protected:
 		return 1;
 	}
 	void rebalancing(int offset) {
-		HashTable<TypeKey, TypeData> tmp(size() + offset);
-		tmp.p = 3011;
-		tmp.q = 3019;//тут должен быть массив
-		for (int i=0;i<storage.size();i++) {
+		HashTable<TypeKey, TypeData>* tmp = new HashTable<TypeKey, TypeData>(size() + offset);
+		tmp->p = 3011;
+		tmp->q = 3019;//тут должен быть массив
+		for (int i = 0; i < storage.size(); i++) {
 			for (int j = 0; j < storage[i].size(); i++) {
-				tmp.insert(HashFunction(storage[i][j].first), storage[i][j].second);
+				tmp->insert(HashFunction(storage[i][j].first), storage[i][j].second);
 			}
 		}
-		this = tmp;
-		tmp = 0;
+		this->storage = tmp->storage;
+		delete tmp;
 	}
 	int HashFunction(std::string key) { //хэш-функция для string
 		int pos = 0;
