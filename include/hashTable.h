@@ -11,62 +11,84 @@ protected:
 	vector<vector<pair<TypeKey, TypeData>>> storage;
 	double averageCollisions = 0;
 	double percentageFilling = 0;
-	int p = 3001;
-	int q = 3011;
+	int p = 10103;
+	int q = 10133;
 	//--------------------------------------------------------------------------------//
 	double calculateAverageCollisions() {
-		return 1;
+		double ans = 0;
+		for (int i = 0; i < size(); i++) {
+			if(storage[i].size())
+				ans += (double)(storage[i].size() - 1);
+		}
+		return ans;
 	}
 	double calculatePercentageFilling() {
-		return 1;
+		double ans = (double)sizeoftable();
+		return (ans / size()) * 100;
 	}
 	bool check() {
-		return 1;
+		averageCollisions = calculateAverageCollisions();
+		percentageFilling = calculatePercentageFilling();
+		if ((averageCollisions >= ((double)sizeoftable() / 2))||(percentageFilling > 150)) 
+				return true;
+		return false;
 	}
 	void rebalancing(int offset) {
-		HashTable<TypeKey, TypeData>* tmp = new HashTable<TypeKey, TypeData>(size() + offset);
-		tmp->p = 3011;
-		tmp->q = 3019;//тут должен быть массив
-		for (int i = 0; i < storage.size(); i++) {
-			for (int j = 0; j < storage[i].size(); i++) {
-				tmp->insert(HashFunction(storage[i][j].first), storage[i][j].second);
+		vector<vector<pair<TypeKey,TypeData>>> new_storage(size() + offset);
+		int primeNumbers[10] = { 10103, 10133, 10141, 10169, 10177, 10211, 10243, 10247, 10259, 13187 };
+		int last_p = p;
+		int last_q = q;
+		for (int i = 0; i < 10; i++) {
+			if (i == 9) {
+				if (primeNumbers[i] == last_p) p = primeNumbers[0];
+				else if (primeNumbers[i] == last_q) q = primeNumbers[0];
+			}
+			else {
+				if (primeNumbers[i] == last_p) p = primeNumbers[i + 1];
+				else if (primeNumbers[i] == last_q) q = primeNumbers[i + 1];
 			}
 		}
-		this->storage = tmp->storage;
-		delete tmp;
+		int a = sizeoftable();
+		for (int i = 0; i < storage.size(); i++) {
+			for (int j = 0; j < storage[i].size(); j++) {
+				TypeKey key = storage[i][j].first;
+				TypeData data = storage[i][j].second;
+				int index = HashFunction(key) % new_storage.size();
+				
+				new_storage[index].push_back(make_pair(key, data));
+			}
+		}
+		storage = new_storage;
 	}
 	int HashFunction(std::string key) { //хэш-функция для string
 		int pos = 0;
 		int p_step = 2;
-		int p = p_step;
+		int hashP = p_step;
 		for (int i = 0; i < key.size(); i++) {
-			pos += key[i] * p; // a1*p+a2*p^2+...+a(n-1)*p^(n-1)
-			p *= p_step;
+			pos += key[i] * hashP; // a1*p+a2*p^2+...+a(n-1)*p^(n-1)
+			hashP *= p_step;
 		}
-		int q = 1009;
-		return (pos % q);
+		return (pos % this->q);
 	}
 	//--------------------------------------------------------------------------------//
 	int HashFunction(std::vector<int> key) { //хэш-функция для string
 		int pos = 0;
 		int p_step = 2;
-		int p = p_step;
+		int hashP = p_step;
 		for (int i = 0; i < key.size(); i++) {
-			pos += key[i] * p; // a1*p+a2*p^2+...+a(n-1)*p^(n-1)
-			p *= p_step;
+			pos += key[i] * hashP; // a1*p+a2*p^2+...+a(n-1)*p^(n-1)
+			hashP *= p_step;
 		}
-		int q = 1009;
 		return (pos % q);
 	}
 	//--------------------------------------------------------------------------------//
 	int HashFunction(int key) { // хэш-функция для int
-		int p1 = 7193, p2 = 1213;
-		return (p1 * key) % p2;
+		return (p * key) % q;
 	}
 	//--------------------------------------------------------------------------------//
 	int HashFunction(size_t key) { // хэш-функция для int
-		size_t p1 = 7193, p2 = 1213;
-		return (p1 * key) % p2;
+		size_t p1 = p, q1 = q;
+		return (p1 * key) % q1;
 	}
 	//--------------------------------------------------------------------------------//
 	int HashFunction(float key) { //хэш-функция для float 
@@ -74,7 +96,7 @@ protected:
 		size_t mask = 1;
 		size_t result = 0;
 		for (int i = 0; i < 64; i++) {
-			if ((size_t)mask & (*a) != 0)
+			if (((size_t)mask & (*a)) != 0)
 				result += mask;
 			mask << 1;
 		}
@@ -86,7 +108,7 @@ protected:
 		size_t mask = 1;
 		size_t result = 0;
 		for (int i = 0; i < 64; i++) {
-			if ((size_t)mask & (*a) != 0)
+			if (((size_t)mask & (*a)) != 0)
 				result += mask;
 			mask << 1;
 		}
@@ -193,6 +215,9 @@ public:
 			}
 		}
 		storage[index].push_back(make_pair(key, data));
+		int a = sizeoftable();
+		if (check()) rebalancing(1);
+		index = HashFunction(key) % storage.size();
 		return hashIterator<TypeKey, TypeData>(storage[index].back());
 	}
 	//--------------------------------------------------------------------------------//
@@ -225,6 +250,7 @@ public:
 				return true;
 			}
 		}
+		if (check()) rebalancing(-1);
 		return false;
 	}
 	//--------------------------------------------------------------------------------//

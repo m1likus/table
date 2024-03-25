@@ -11,20 +11,30 @@ using namespace std;
 
 int main() {
 	{
-		BinTreeTable<int, int> a;
-		a.insert(2, 2);
-		a.insert(1, 1);
-		a.insert(4, 4);
-		a.insert(3, 3);
-		a.insert(5, 5);
-		a.insert(6, 6);
-		a.remove(4);
-		a.insert(0, 0);
-		a.insert(4, 4);
+		int data = 10;
+		int key = 25;
+		HashTable<int, int> a(100);
+		a.insert(key, data);
+		a.insert(key + 20, data + 1);
+		a.insert(key - 20, data - 1);
 
-		cout << a[4];
+		if (a[key] == data)return 1;
+		return 0;
 	}
 	
+	//BinTreeTable<int, int> a;
+	//a.insert(2, 2);
+	//a.insert(1, 1);
+	//a.insert(4, 4);
+	//a.insert(3, 3);
+	//a.insert(5, 5);
+	//a.insert(6, 6);
+	//a.remove(4);
+	//a.insert(0, 0);
+	//a.insert(4, 4);
+	//
+	//cout << a[4];
+	//
 	//HashTable<string, int> a(50000);
 	//a.insert("apple", 123);
 	//a.insert("mango", 432);
