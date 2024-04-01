@@ -17,22 +17,14 @@ protected:
 	double calculateAverageCollisions() {
 		double ans = 0;
 		for (int i = 0; i < size(); i++) {
-<<<<<<< HEAD
-			ans = (ans + storage[i].size())/2;
-=======
 			if(storage[i].size())
 				ans += (double)(storage[i].size() - 1);
->>>>>>> Matvey
 		}
 		return ans;
 	}
 	double calculatePercentageFilling() {
-<<<<<<< HEAD
-		int elements = 0;
-=======
 		double ans = (double)sizeoftable();
 		return (ans / size()) * 100;
->>>>>>> Matvey
 	}
 	bool check() {
 		averageCollisions = calculateAverageCollisions();
@@ -66,7 +58,7 @@ protected:
 				new_storage[index].push_back(make_pair(key, data));
 			}
 		}
-		cout << "-1-";
+		//cout << "-1-";
 		storage = new_storage;
 	}
 	int HashFunction(std::string key) { //хэш-функция для string
