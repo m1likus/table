@@ -58,6 +58,7 @@ protected:
 				new_storage[index].push_back(make_pair(key, data));
 			}
 		}
+		cout << "-1-";
 		storage = new_storage;
 	}
 	int HashFunction(std::string key) { //хэш-функция для string
