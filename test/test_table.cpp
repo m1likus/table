@@ -266,8 +266,8 @@ TEST(HashTable, get_data_by_key_int)
     int key = 25;
     HashTable<int, int> a(100);
     a.insert(key, data);
-    a.insert(key + 20, data + 1);
-    a.insert(key - 20, data - 1);
+    a.insert(key + 19, data + 1);
+    a.insert(key - 21, data - 1);
 
     EXPECT_EQ(a[key], data);
 }
@@ -278,8 +278,8 @@ TEST(HashTable, get_data_by_key_float)
     int key = 25.234;
     HashTable<float, int> a(100);
     a.insert(key, data);
-    a.insert(key + 20.345, data + 1);
-    a.insert(key - 20.345, data - 1);
+    a.insert(key + 19.347, data + 1);
+    a.insert(key - 21.344, data - 1);
 
     EXPECT_EQ(a[key], data);
 }
@@ -290,8 +290,8 @@ TEST(HashTable, get_data_by_key_double)
     int key = 25.234;
     HashTable<double, int> a(100);
     a.insert(key, data);
-    a.insert(key + 20.345, data + 1);
-    a.insert(key - 20.345, data - 1);
+    a.insert(key + 19.347, data + 1);
+    a.insert(key - 21.344, data - 1);
 
     EXPECT_EQ(a[key], data);
 }
