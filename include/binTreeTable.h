@@ -36,42 +36,45 @@ public:
 	}
 	//--------------------------------------------------------------------------------//
 	BinTreeTable(const BinTreeTable& other) { //конструктор копирования
-		if (other.root == 0) {
+		if (other.root == 0) { //если пустое - то будет пустое
 			root = 0;
 		}
 		else {
-			root = new Node<TypeKey, TypeData>();
-			root->parent = 0;
+			root = new Node<TypeKey, TypeData>(); //создаем узел корня
+			root->parent = 0; //пустой корень
 			root->left = 0;
 			root->right = 0;
-			root->storage = other.root->storage;
-			Node<TypeKey, TypeData>* n1 = root;
-			Node<TypeKey, TypeData>* n2 = root;
-			Node<TypeKey, TypeData>* other_n1 = other.root;
-			Node<TypeKey, TypeData>* other_n2 = other.root;
-			while (n2 != 0) {
+			root->storage = other.root->storage;  //скопировали хранилище
+			Node<TypeKey, TypeData>* n1 = root; //где были
+			Node<TypeKey, TypeData>* n2 = root; //куда идем
+			Node<TypeKey, TypeData>* other_n1 = other.root; //где были в other
+			Node<TypeKey, TypeData>* other_n2 = other.root; //куда идем в other
+			while (n2 != 0) { //пока есть куда идти
 				n1 = n2;
 				other_n1 = other_n2;
-				if (other_n1->left != 0 && n1->left == 0) {
-					other_n2 = other_n1->left;
-					n2 = new Node<TypeKey, TypeData>();
-					n2->parent = n1;
+				if (other_n1->left != 0 && n1->left == 0) { 
+					//если левый потомок в other не пуст, а в this пуст, то
+					other_n2 = other_n1->left; //приходим в левый потомок other
+					n2 = new Node<TypeKey, TypeData>(); //раз пуст, то создадим новый узел
+					n2->parent = n1; //заполним его
 					n2->left = 0;
 					n2->right = 0;
 					n2->storage = other_n2->storage;
-					n1->left = n2;
+					n1->left = n2; //переходим в потомок this
 				}
 				else if (other_n1->right != 0 && n1->right == 0) {
-					other_n2 = other_n1->right;
-					n2 = new Node<TypeKey, TypeData>();
-					n2->parent = n1;
+					//если правый потомок other не пуст, а в this пуст, то
+					other_n2 = other_n1->right; //переходим в правый потомок other
+					n2 = new Node<TypeKey, TypeData>(); //создаем новый узел
+					n2->parent = n1; //заполняем
 					n2->left = 0;
 					n2->right = 0;
 					n2->storage = other_n2->storage;
-					n1->right = n2;
+					n1->right = n2; //переходим в потомок this
 				}
 				else {
-					n2 = n1->parent;
+					//если и правый и левый пуст - переходим в родителя
+					n2 = n1->parent; 
 					other_n2 = other_n1->parent;
 				}
 			}
@@ -81,24 +84,25 @@ public:
 	//--------------------------------------------------------------------------------//
 	~BinTreeTable() { //деструктор
 		if (root == 0) {
-			delete root;// = nullptr;
+			delete root;// = nullptr; //если пусто - удаляем
 		}
+		//иначе надо удалять снизу вверх, чтобы точно удалить все
 		else {
-			Node<TypeKey,TypeData>* n1 = root;
-			Node<TypeKey, TypeData>* n2 = root;
-			while (n2 != NULL) {
-				n1 = n2;
-				if (n1->left != 0) {
+			Node<TypeKey,TypeData>* n1 = root; //где были
+			Node<TypeKey, TypeData>* n2 = root; //куда идем
+			while (n2 != NULL) { //пока есть куда идти
+				n1 = n2; //начинаем спускаться вниз до упора
+				if (n1->left != 0) { //есть левый потомок
 					n2 = n1->left;
 					n1->left = 0;
 				}
-				else if (n2->right != 0) {
+				else if (n2->right != 0) { //есть правый потомок
 					n2 = n1->right;
 					n1->right = 0;
 				}
-				else {
-					n2 = n1->parent;
-					delete n1;
+				else { //если узел без потомков
+					n2 = n1->parent; //возвращаемся в родителя
+					delete n1; //а узел удаляем
 				}
 			}
 		}
@@ -108,24 +112,24 @@ public:
 	//--------------------------------------------------------------------------------//
 	BinTreeTable& operator=(const BinTreeTable& other) { //оператор присваивания
 		if (&other != this) {
-			if (root == 0) {
+			if (root == 0) { //если дерево чему присваиваем пустое
 				if (other.root == 0) {
 					root = 0;
 				}
-				else {
-					root = new Node<TypeKey, TypeData>();
-					root->parent = 0;
+				else { //начинаем создавать новое дерево
+					root = new Node<TypeKey, TypeData>(); //создаем корень
+					root->parent = 0; //заполняем
 					root->left = 0;
 					root->right = 0;
 					root->storage = other.root->storage;
-					Node<TypeKey, TypeData>* n1 = root;
-					Node<TypeKey, TypeData>* n2 = root;
+					Node<TypeKey, TypeData>* n1 = root; //были
+					Node<TypeKey, TypeData>* n2 = root; //стали
 					Node<TypeKey, TypeData>* other_n1 = other.root;
 					Node<TypeKey, TypeData>* other_n2 = other.root;
 					while (n2 != 0) {
 						n1 = n2;
 						other_n1 = other_n2;
-						if (other_n1->left != 0 && n1->left == 0) {
+						if (other_n1->left != 0 && n1->left == 0) { 
 							other_n2 = other_n1->left;
 							n2 = new Node<TypeKey, TypeData>();
 							n2->parent = n1;
@@ -151,8 +155,8 @@ public:
 
 				}
 			}
-			else {
-				if (other.root == 0) {
+			else { //если не пустое
+				if (other.root == 0) { //а то что присваиваем пустое - удаляем все
 					Node<TypeKey, TypeData>* n1 = root;
 					Node<TypeKey, TypeData>* n2 = root;
 					while (n2 != NULL) {
@@ -174,7 +178,7 @@ public:
 					delete n2;
 					root = 0;
 				}
-				else {
+				else { //если были оба не пустыми
 					root->storage = other.root->storage;
 					Node<TypeKey, TypeData>* n1 = root;
 					Node<TypeKey, TypeData>* n2 = root;
@@ -270,7 +274,6 @@ public:
 			return n1->storage.second;
 	}
 	//--------------------------------------------------------------------------------//
-		//возвращаемое значение - ссылка на итератор на найденный элемент
 	Iterator<TypeKey, TypeData> find(const TypeKey& key){
 		Node<TypeKey, TypeData>* n1 = root;
 		while (n1 != 0 && n1->storage.first != key) {
@@ -281,12 +284,31 @@ public:
 		}
 		return Iterator<TypeKey, TypeData>(n1->storage);
 	}
+//--------------------------------------------------------------------------------//
 	int size() {
-
+		int count = 0;
+		if (root == 0) return count;
+		Node<TypeKey, TypeData>* n1 = root;
+		Node<TypeKey, TypeData>* n2 = root;
+		while (n2 != 0) {
+			n1 = n2;
+			if (n1->left != 0) {
+				n2 = n1->left;
+				n1->left = 0;
+			}
+			else if (n2->right != 0) {
+				n2 = n1->right;
+				n1->right = 0;
+			}
+			else {
+				n2 = n1->parent;
+				count++;
+			}
+		}
+		return count;
 	}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& d) {
-		//...
 		if (root == 0) {
 			root = new Node<TypeKey, TypeData>();
 			root->parent = 0;
@@ -322,8 +344,7 @@ public:
 			return Iterator<TypeKey, TypeData>(n1->storage);
 		}
 	}
-	//--------------------------------------------------------------------------------//
-		//возвращаем true/false
+//--------------------------------------------------------------------------------//
 	bool remove(const TypeKey& key) {
 		Node<TypeKey, TypeData>* n1 = root;
 		while (n1 != 0 && n1->storage.first != key) {

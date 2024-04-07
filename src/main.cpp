@@ -22,10 +22,11 @@ int main() {
 		for (int i = 0; i < 6; i++) {
 			cout << t[i] << "\n";
 		}
-		if (t.remove(3))cout << 1;
-		else cout << 0;
-		if (t.remove(3))cout << 1;
-		else cout << 0;
+		cout << t.size();
+		//if (t.remove(3))cout << 1;
+		//else cout << 0;
+		//if (t.remove(3))cout << 1;
+		//else cout << 0;
 
 		//BinTreeTable<int, int> t1 = t;
 		//
