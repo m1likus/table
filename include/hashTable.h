@@ -48,22 +48,22 @@ public:
 		return *this;
 	}
 	hashIterator& operator--() {
-		int index1 = HashFunction(iterator.first) % it_storage->size();
+		int index1 = it_table->HashFunction(iterator->first) % it_table->size();
 		int index2;
-		for (int index2 = 0; index2 < it_storage[index1]->size(); index2++) {
-			if (it_storage[index1][index2]->first == iterator.first) {
+		for (int index2 = 0; index2 < it_table[index1].size(); index2++) {
+			if ((it_table->storage)[index1][index2].first == iterator->first) {
 				break;
 			}
 		}
 		if (index2 > 0)
 			index2--;
 		else {
-			index1 = (it_storage.size() + index1 - 1) % it_storage->size();
-			while (it_storage[index1]->size() == 0)
-				index1 = (it_storage->size() + index1 - 1) % it_storage->size();
-			index2 = it_storage[index1]->size() - 1;
+			index1 = (it_table->size() + index1 - 1) % it_table->size();
+			while (it_table[index1].size() == 0)
+				index1 = (it_table->storage.size() + index1 - 1) % it_table->storage.size();
+			index2 = it_table[index1].size() - 1;
 		}
-		iterator = &it_storage[index1][index2];
+		iterator = &((it_table->storage)[index1][index2]);
 		return *this;
 	}
 	hashIterator operator+(int offset) {
