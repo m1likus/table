@@ -3,6 +3,9 @@
 #include <string>
 #include "table.h"
 
+template <typename TypeKey, typename T>
+class binTreeIterator;
+
 template <typename TypeKey, typename TypeData>
 class Node {
 public:
@@ -25,16 +28,14 @@ public:
 
 template <typename TypeKey, typename TypeData>
 class BinTreeTable {
-private:
-
 protected:
 	Node<TypeKey, TypeData>* root;
 public:
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	BinTreeTable() { //конструктор по умолчанию
 		root = 0;
 	}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	BinTreeTable(const BinTreeTable& other) { //конструктор копирования
 		if (other.root == 0) { //если пустое - то будет пустое
 			root = 0;
@@ -81,7 +82,7 @@ public:
 
 		}
 	}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	~BinTreeTable() { //деструктор
 		if (root == 0) {
 			delete root;// = nullptr; //если пусто - удаляем
@@ -109,7 +110,7 @@ public:
 		root = 0;
 		//delete root;
 	}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	BinTreeTable& operator=(const BinTreeTable& other) { //оператор присваивания
 		if (&other != this) {
 			if (root == 0) { //если дерево чему присваиваем пустое
@@ -259,7 +260,7 @@ public:
 		}
 		return *this;
 	}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	TypeData& operator[] (const TypeKey& key) { //оператор []
 		Node<TypeKey, TypeData>* n1 = root;
 		while (n1 != 0 && n1->storage.first != key) {
@@ -273,8 +274,8 @@ public:
 		if (n1->storage.first != key)
 			return n1->storage.second;
 	}
-	//--------------------------------------------------------------------------------//
-	Iterator<TypeKey, TypeData> find(const TypeKey& key){
+//--------------------------------------------------------------------------------//
+	binTreeIterator<TypeKey, TypeData> find(const TypeKey& key){
 		Node<TypeKey, TypeData>* n1 = root;
 		while (n1 != 0 && n1->storage.first != key) {
 			if (n1->storage.first < key)
@@ -308,14 +309,15 @@ public:
 		return count;
 	}
 //--------------------------------------------------------------------------------//
-	Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& d) {
+	binTreeIterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& d) {
 		if (root == 0) {
 			root = new Node<TypeKey, TypeData>();
 			root->parent = 0;
 			root->left = 0;
 			root->right = 0;
 			root->storage = make_pair(key, d);
-			return Iterator<TypeKey, TypeData>(root->storage);
+			return binTreeIterator<TypeKey, TypeData>();
+			//return binTreeIterator<TypeKey, TypeData>(root->storage);
 		}
 		else {
 			Node<TypeKey, TypeData>* n1 = root;
@@ -341,7 +343,8 @@ public:
 			else if (n1->storage.first == key) {
 				n1->storage.second = d;
 			}
-			return Iterator<TypeKey, TypeData>(n1->storage);
+			return binTreeIterator<TypeKey, TypeData>();
+			//return binTreeIterator<TypeKey, TypeData>(n1->storage);
 		}
 	}
 //--------------------------------------------------------------------------------//
@@ -381,19 +384,45 @@ public:
 			return true;
 		}
 	}
-	//--------------------------------------------------------------------------------//
-		//итератор на начало
-	//Iterator<TypeKey, TypeData> begin() {
-	//	return Iterator<TypeKey, TypeData>(storage[0]);
-		//итераторы вообще не трогал, мне ещё подумать надо как реализовать, 
-		//скорее всего черновой вариант будет как у хэша, тоесть совй собственный итератор, 
-		//а потом если нам будет не лень, то сделаем задумку, о которой на паре говорили
-	//}
-	//--------------------------------------------------------------------------------//
-		//итератор на конец
-	//Iterator<TypeKey, TypeData> end() {
-	//	Iterator<TypeKey, TypeData> a = begin();
-	//	return a + storage.size();
-	//}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
+	//итератор на начало
+	binTreeIterator<TypeKey, TypeData> begin() {
+		if (root = 0) return binTreeIterator<TypeKey, TypeData>(*(root));
+		else {
+			Node<TypeKey, TypeData>* n1 = root;
+			Node<TypeKey, TypeData>* n2 = root;
+			while (n2 != 0) {
+				n1 = n2;
+				if (n1->left != 0)
+					n2 = n1->left;
+			}
+			return binTreeIterator<TypeKey, TypeData>(*(n2));
+		}
+	}
+//--------------------------------------------------------------------------------//
+	//итератор на конец
+	Iterator<TypeKey, TypeData> end() {
+		if (root = 0) return binTreeIterator<TypeKey, TypeData>(*(root));
+		else {
+			Node<TypeKey, TypeData>* n1 = root;
+			Node<TypeKey, TypeData>* n2 = root;
+			while (n2 != 0) {
+				n1 = n2;
+				if (n1->right != 0)
+					n2 = n1->right;
+			}
+			return binTreeIterator<TypeKey, TypeData>(*(n2));
+		}
+	}
+//--------------------------------------------------------------------------------//
+};
+
+
+template <typename TypeKey, typename T>
+class binTreeIterator {
+protected:
+	//TODO
+	pair <TypeKey, T>* iterator;
+	Node <TypeKey, T>* n;
+public:
 };

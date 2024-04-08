@@ -4,6 +4,84 @@
 #include "table.h"
 #include <math.h>
 
+template<typename TypeKey, typename TypeData>
+class HashTable;
+
+
+template<typename TypeKey, typename T>
+class hashIterator {
+protected:
+	pair<TypeKey, T>* iterator;
+	vector<vector<pair<TypeKey, T>>>* it_storage;
+public:
+	hashIterator(pair<TypeKey, T>& data, vector<vector<pair<TypeKey, T>>>& new_storage) {
+		iterator = &data;
+		it_storage = &new_storage;
+	}
+	hashIterator(const hashIterator& other) {
+		iterator = other.iterator;
+		it_storage = other.it_storage;
+	}
+	T& operator*() const {
+		return iterator->second;
+	}
+	T* operator->() const {
+		return iterator.second;
+	}
+	hashIterator& operator++() {
+		int index1 = HashTable<TypeKey,T>::HashFunction(((*iterator).first)) % it_storage.size();
+		int index2 = 0;
+		for (int index2 = 0; index2 < (*it_storage)[index1].size(); index2++) {
+			if ((*it_storage)[index1][index2].first == iterator->first) {
+				break;
+			}
+		}
+		if (index2 < (*it_storage)[index1].size() - 1)
+			index2++;
+		else {
+			index1 = (index1 + 1) % (*it_storage).size();
+			while ((*it_storage)[index1].size() == 0)
+				index1 = (index1 + 1) % (*it_storage).size();
+			index2 = 0;
+		}
+		iterator = &((*it_storage)[index1][index2]);
+		return *this;
+	}
+	hashIterator& operator--() {
+		int index1 = HashFunction(iterator.first) % it_storage->size();
+		int index2;
+		for (int index2 = 0; index2 < it_storage[index1]->size(); index2++) {
+			if (it_storage[index1][index2]->first == iterator.first) {
+				break;
+			}
+		}
+		if (index2 > 0)
+			index2--;
+		else {
+			index1 = (it_storage.size() + index1 - 1) % it_storage->size();
+			while (it_storage[index1]->size() == 0)
+				index1 = (it_storage->size() + index1 - 1) % it_storage->size();
+			index2 = it_storage[index1]->size() - 1;
+		}
+		iterator = &it_storage[index1][index2];
+		return *this;
+	}
+	hashIterator operator+(int offset) {
+		hashIterator<TypeKey, T> tmp = *this;
+		for (int i = 0; i < offset; i++) {
+			tmp++;
+		}
+		return tmp;
+	}
+	bool operator==(const hashIterator& other) {
+		return iterator == other.iterator;
+	}
+	bool operator!=(const hashIterator& other) {
+		return iterator != other.iterator;
+	}
+};
+
+
 
 template<typename TypeKey,typename TypeData>
 class HashTable {
@@ -13,7 +91,7 @@ protected:
 	double percentageFilling = 0;
 	int p = 10103;
 	int q = 10133;
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	double calculateAverageCollisions() {
 		double ans = 0;
 		for (int i = 0; i < size(); i++) {
@@ -61,6 +139,7 @@ protected:
 		//cout << "-1-";
 		storage = new_storage;
 	}
+public:
 	int HashFunction(std::string key) { //хэш-функция для string
 		int pos = 0;
 		int p_step = 2;
@@ -71,7 +150,7 @@ protected:
 		}
 		return (pos % this->q);
 	}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	int HashFunction(std::vector<int> key) { //хэш-функция для string
 		int pos = 0;
 		int p_step = 2;
@@ -82,16 +161,16 @@ protected:
 		}
 		return (pos % q);
 	}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	int HashFunction(int key) { // хэш-функция для int
 		return (p * key) % q;
 	}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	int HashFunction(size_t key) { // хэш-функция для int
 		size_t p1 = p, q1 = q;
 		return (p1 * key) % q1;
 	}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	int HashFunction(float key) { //хэш-функция для float 
 		size_t* a = (size_t*)(&key);
 		size_t mask = 1;
@@ -103,7 +182,7 @@ protected:
 		}
 		return HashFunction(result);
 	}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	int HashFunction(double key) { //хэш-фукнция для double 
 		size_t* a = (size_t*)(&key);
 		size_t mask = 1;
@@ -116,81 +195,7 @@ protected:
 		return HashFunction(result);
 
 	}
-
-	template<typename TypeKey, typename T>
-	class hashIterator {
-	protected:
-		pair<TypeKey, T>* iterator;
-		vector<vector<pair<TypeKey, T>>>* it_storage;
-	public:
-		hashIterator(pair<TypeKey, T>& data, vector<vector<pair<TypeKey, T>>>& new_storage) {
-			iterator = &data;
-			it_storage = &new_storage;
-		}
-		hashIterator(const hashIterator& other) {
-			iterator = other.iterator;
-			it_storage = other.it_storage;
-		}
-		T& operator*() const {
-			return iterator->second;
-		}
-		T* operator->() const {
-			return iterator.second;
-		}
-		hashIterator& operator++() {
-			int index1 = HashFunction(iterator->first) % (*it_storage).size();
-			int index2 = 0;
-			for (int index2 = 0; index2 < (*it_storage)[index1].size(); index2++) {
-				if ((*it_storage)[index1][index2].first == iterator->first) {
-					break;
-				}
-			}
-			if (index2 < (*it_storage)[index1].size() - 1)
-				index2++;
-			else {
-				index1 = (index1 + 1) % (*it_storage).size();
-				while ((*it_storage)[index1].size() == 0)
-					index1 = (index1 + 1) % (*it_storage).size();
-				index2 = 0;
-			}
-			iterator = &((*it_storage)[index1][index2]);
-			return *this;
-		}
-		hashIterator& operator--() {
-			int index1 = HashFunction(iterator.first) % it_storage->size();
-			int index2;
-			for (int index2 = 0; index2 < it_storage[index1]->size(); index2++) {
-				if (it_storage[index1][index2]->first == iterator.first) {
-					break;
-				}
-			}
-			if (index2 > 0)
-				index2--;
-			else {
-				index1 = (it_storage.size() + index1 - 1) % it_storage->size();
-				while (it_storage[index1]->size() == 0)
-					index1 = (it_storage->size() + index1 - 1) % it_storage->size();
-				index2 = it_storage[index1]->size() - 1;
-			}
-			iterator = &it_storage[index1][index2];
-			return *this;
-		}
-		hashIterator operator+(int offset) {
-			hashIterator<TypeKey, T> tmp = *this;
-			for (int i = 0; i < offset; i++) {
-				tmp++;
-			}
-			return tmp;
-		}
-		bool operator==(const hashIterator& other) {
-			return iterator == other.iterator;
-		}
-		bool operator!=(const hashIterator& other) {
-			return iterator != other.iterator;
-		}
-	};
-	//--------------------------------------------------------------------------------//
-public:
+//--------------------------------------------------------------------------------//
 	HashTable() {
 		storage = vector<vector<pair<TypeKey, TypeData>>>();
 	}
@@ -209,7 +214,7 @@ public:
 		storage = other.storage;
 		return *this;
 	}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	hashIterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data) {
 		int index = HashFunction(key) % storage.size();
 		for (int i = 0; i < storage[index].size(); i++) {
@@ -224,7 +229,7 @@ public:
 		index = HashFunction(key) % storage.size();
 		return hashIterator<TypeKey, TypeData>(storage[index].back(),storage);
 	}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	TypeData& operator[] (const TypeKey& key) { //оператор []
 		int index = HashFunction(key) % storage.size();
 		for (int i = 0; i < storage[index].size(); i++) {
@@ -235,7 +240,7 @@ public:
 		storage[index].push_back(make_pair(key, TypeData()));
 		return storage[index].back().second;
 	}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	hashIterator<TypeKey, TypeData> find(const TypeKey& key) {
 		int index = HashFunction(key) % storage.size();
 		for (int i = 0; i < storage[index].size(); i++) {
@@ -245,7 +250,7 @@ public:
 		}
 		return end();
 	}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	bool remove(const TypeKey& key) {
 		int index = HashFunction(key) % storage.size();
 		for (int i = 0; i < storage[index].size(); i++) {
@@ -257,11 +262,11 @@ public:
 		if (check()) rebalancing(-1);
 		return false;
 	}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	int size() {
 		return storage.size();
 	}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	int sizeoftable() {
 		int sum = 0;
 		for (int i = 0; i < size(); i++) {
@@ -269,7 +274,7 @@ public:
 		}
 		return sum;
 	}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	hashIterator<TypeKey, TypeData> begin() {
 		if (storage.empty()) return hashIterator<TypeKey, TypeData>(storage[storage.size() - 1][0],storage);
 		int index = 0;
@@ -277,7 +282,7 @@ public:
 			index++;
 		return hashIterator<TypeKey, TypeData>(storage[index][0],storage);
 	}
-	//--------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------//
 	hashIterator<TypeKey, TypeData> end() {
 		if (storage.empty()) return hashIterator<TypeKey, TypeData>(storage[storage.size() - 1][0],storage);
 		int index = storage.size()-1;
@@ -285,129 +290,5 @@ public:
 			index--;
 		return hashIterator<TypeKey, TypeData>(storage[index][storage[index].size() - 1],storage);
 	}
-
 };
 
-
-//--------------------------------------------------------------------------------//
-//template<typename TypeKey,typename TypeData>
-//class HashTable : public baseTable<TypeKey, TypeData> {
-//protected:
-//	vector<vector<pair<TypeKey, TypeData>>> storage;
-////--------------------------------------------------------------------------------//
-//	int HashFunction(std::string key) { //хэш-функция для string
-//		int pos = 0;
-//		int p_step = 2;
-//		int p = p_step;
-//		for (int i = 0; i < key.size(); i++) {
-//			pos += key[i] * p; // a1*p+a2*p^2+...+a(n-1)*p^(n-1)
-//			p *= p_step;
-//		}
-//		int q = 1009;
-//		return (pos % q);
-//	}
-////--------------------------------------------------------------------------------//
-//	int HashFunction(int key) { // хэш-функция для int
-//		int p1 = 7193, p2 = 1213;
-//		return (p1*key)%p2;
-//	}
-////--------------------------------------------------------------------------------//
-//	int HashFunction(float key) { //хэш-функция для float 
-//		float mantissa = frexp(key); //frexp returns number's mantissa
-//		int p = mantissa * 1000000000;
-//		return (HashFunction(p));
-//	}
-////--------------------------------------------------------------------------------//
-//	int HashFunction(double key) { //хэш-фукнция для double
-//		double mantissa = frexp(key);
-//		int p = mantissa * 1000000000;
-//		return (HashFunction(p));
-//	}
-////--------------------------------------------------------------------------------//
-//	Iterator<TypeKey, TypeData>& operator++() {
-//
-//		return Iterator<TypeKey, TypeData>::iterator;
-//	}
-//public:
-//	HashTable(int size) {
-//		storage = vector<vector<pair<TypeKey, TypeData>>>(size);
-//	}
-////--------------------------------------------------------------------------------//
-//	Iterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data) {
-//		int index = HashFunction(key)%storage.size();
-//		for (int i = 0; i < storage[index].size(); i++) {
-//			if (storage[index][i].first == key) {
-//				storage[index][i].second = data;
-//				return Iterator<TypeKey, TypeData>(storage[index][i]);
-//			}
-//		}
-//		storage[index].push_back(make_pair(key, data));
-//		return Iterator<TypeKey, TypeData>(storage[index].back());
-//	}
-////--------------------------------------------------------------------------------//
-//	TypeData& operator[] (const TypeKey& key) { //оператор []
-//		int index = HashFunction(key)%storage.size(); 
-//		for (int i = 0; i < storage[index].size(); i++) {
-//			if (storage[index][i].first == key) {
-//				return storage[index][i].second;
-//			}
-//		}
-//		storage[index].push_back(make_pair(key, TypeData()));
-//		return storage[index].back().second;
-//	}
-////--------------------------------------------------------------------------------//
-//	Iterator<TypeKey, TypeData> find(const TypeKey& key) {
-//		int index = HashFunction(key)%storage.size();
-//		for (int i = 0; i < storage[index].size(); i++) {
-//			if (storage[index][i].first == key) {
-//				return Iterator<TypeKey, TypeData>(storage[index][i]);
-//			}
-//		}
-//		return end(); 
-//	}
-////--------------------------------------------------------------------------------//
-//	bool remove(const TypeKey& key) {
-//		int index = HashFunction(key) % storage.size();
-//		for (int i = 0; i < storage[index].size(); i++) {
-//			if (storage[index][i].first == key) {
-//				storage[index].erase(storage[index].begin() + i);
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-////--------------------------------------------------------------------------------//
-//	int size() {
-//		return storage.size();
-//	}
-////--------------------------------------------------------------------------------//
-//	int sizeoftable() {
-//		int sum = 0;
-//		for (int i = 0; i < size(); i++) {
-//			sum += storage[i].size();
-//		}
-//		return sum;
-//	}
-////--------------------------------------------------------------------------------//
-//	//итератор на начало
-//	Iterator<TypeKey, TypeData> begin() {
-//		if (storage.empty()) return (storage[0][0] + sizeoftable());
-//		for (int i = 0; i < storage.size(); i++) {
-//			if (!storage[i].empty()) {
-//				return Iterator::iterator(storage[i].begin());
-//			}
-//		}
-//	}
-////--------------------------------------------------------------------------------//
-//	//итератор на конец
-//	Iterator<TypeKey, TypeData> end() {
-//		if (storage.empty()) return (storage[0][0] + sizeoftable());
-//		for (int i = storage.size(); i > 0; i--) {
-//			if (!storage[i].empty()) {
-//				return Iterator::iterator(storage[i].end());
-//			}
-//		}
-//	}
-////--------------------------------------------------------------------------------//
-//	
-//};
