@@ -364,12 +364,15 @@ TEST(HashTable, test_rebalansing)
     HashTable<int, int> a(s);
     a.insert(20, 20);
     a.insert(120, 20);
+    a.insert(21, 20);
     a.insert(20, 20);
-    a.insert(20, 20);
-    for (auto i = a.begin(); i != a.end(); ++i) {
-        //*i = *i + 1;
+    for (auto i = a.end(); i != a.begin(); --i) {
+        *i = *i + 1;
     }
-    cout << a[20];
+    //for (auto i = a.begin(); i != a.end(); ++i) {
+    //    ASSERT_NE(*i, *i);
+    //}
+    //cout << a[20];
     EXPECT_EQ(a.size(), s +1);
 }
 

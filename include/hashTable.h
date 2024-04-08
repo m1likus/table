@@ -31,7 +31,7 @@ public:
 	hashIterator& operator++() {
 		int index1 = it_table->HashFunction(iterator->first) % it_table->size();
 		int index2 = 0;
-		for (int index2 = 0; index2 < (it_table->storage)[index1].size(); index2++) {
+		for (index2 = 0; index2 < (it_table->storage)[index1].size(); index2++) {
 			if ((it_table->storage)[index1][index2].first == iterator->first) {
 				break;
 			}
@@ -39,7 +39,7 @@ public:
 		if (index2 < (it_table->storage)[index1].size() - 1)
 			index2++;
 		else {
-			index1 = (index1 + 1) % (it_table->storage).size();
+			index1 = (index1 + 1) % it_table->size();
 			while ((it_table->storage)[index1].size() == 0)
 				index1 = (index1 + 1) % (it_table->storage).size();
 			index2 = 0;
@@ -49,9 +49,9 @@ public:
 	}
 	hashIterator& operator--() {
 		int index1 = it_table->HashFunction(iterator->first) % it_table->size();
-		int index2;
-		for (int index2 = 0; index2 < it_table[index1].size(); index2++) {
-			if ((it_table->storage)[index1][index2].first == iterator->first) {
+		int index2 = 0;
+		for (index2 = 0; index2 < it_table->storage[index1].size(); index2++) {
+			if (it_table->storage[index1][index2].first == iterator->first) {
 				break;
 			}
 		}
@@ -59,9 +59,9 @@ public:
 			index2--;
 		else {
 			index1 = (it_table->size() + index1 - 1) % it_table->size();
-			while (it_table[index1].size() == 0)
+			while (it_table->storage[index1].size() == 0)
 				index1 = (it_table->storage.size() + index1 - 1) % it_table->storage.size();
-			index2 = it_table[index1].size() - 1;
+			index2 = it_table->storage[index1].size() - 1;
 		}
 		iterator = &((it_table->storage)[index1][index2]);
 		return *this;

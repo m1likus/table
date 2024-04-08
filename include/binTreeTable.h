@@ -30,6 +30,7 @@ template <typename TypeKey, typename TypeData>
 class BinTreeTable {
 protected:
 	Node<TypeKey, TypeData>* root;
+	friend binTreeIterator
 public:
 //--------------------------------------------------------------------------------//
 	BinTreeTable() { //конструктор по умолчанию
@@ -423,10 +424,10 @@ class binTreeIterator {
 protected:
 	//TODO
 	pair <TypeKey, T>* iterator;
-	Node <TypeKey, T>* n;
+	BinTreeTable<TypeKey, T>* it_table;
 public:
-	binTreeIterator(Node<TypeKey, T> n1) {
-		iterator = &n1.storage;
-		n = &n1;
+	binTreeIterator(pair<TypeKey, T>& data, BinTreeTable<TypeKey, T>& new_table) {
+		iterator = &data;
+		it_table = &new_table;
 	}
 };
