@@ -12,17 +12,27 @@ using namespace std;
 int main() {
 	{
 
-		BinTreeTable<int, int> t;
-		t.insert(3, 3);
-		t.insert(1, 1);
-		t.insert(2, 2);
-		t.insert(5, 5);
-		t.insert(4, 4);
-		t.insert(0, 0);
-		for (int i = 0; i < 6; i++) {
-			cout << t[i] << "\n";
-		}
-		cout << t.size();
+		int data = 10;
+		int key = 25;
+		HashTable<int, int> a(100);
+		a.insert(key, data);
+		a.insert(key + 20, data + 1);
+		a.insert(key - 20, data - 1);
+
+		if (a[key] == data)return 1;
+		return 0;
+
+		//BinTreeTable<int, int> t;
+		//t.insert(3, 3);
+		//t.insert(1, 1);
+		//t.insert(2, 2);
+		//t.insert(5, 5);
+		//t.insert(4, 4);
+		//t.insert(0, 0);
+		//for (int i = 0; i < 6; i++) {
+		//	cout << t[i] << "\n";
+		//}
+		//cout << t.size();
 		//if (t.remove(3))cout << 1;
 		//else cout << 0;
 		//if (t.remove(3))cout << 1;

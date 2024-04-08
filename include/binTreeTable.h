@@ -425,4 +425,8 @@ protected:
 	pair <TypeKey, T>* iterator;
 	Node <TypeKey, T>* n;
 public:
+	binTreeIterator(Node<TypeKey, T> n1) {
+		iterator = &n1.storage;
+		n = &n1;
+	}
 };

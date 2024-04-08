@@ -12,15 +12,15 @@ template<typename TypeKey, typename T>
 class hashIterator {
 protected:
 	pair<TypeKey, T>* iterator;
-	vector<vector<pair<TypeKey, T>>>* it_storage;
+	HashTable<TypeKey, T>* it_table;
 public:
-	hashIterator(pair<TypeKey, T>& data, vector<vector<pair<TypeKey, T>>>& new_storage) {
+	hashIterator(pair<TypeKey, T>& data, HashTable<TypeKey, T>& new_table) {
 		iterator = &data;
-		it_storage = &new_storage;
+		it_table = &new_table;
 	}
 	hashIterator(const hashIterator& other) {
 		iterator = other.iterator;
-		it_storage = other.it_storage;
+		it_table = other.it_table;
 	}
 	T& operator*() const {
 		return iterator->second;
@@ -29,22 +29,22 @@ public:
 		return iterator.second;
 	}
 	hashIterator& operator++() {
-		int index1 = HashTable<TypeKey,T>::HashFunction(((*iterator).first)) % it_storage.size();
+		int index1 = it_table->HashFunction(iterator->first) % it_table->size();
 		int index2 = 0;
-		for (int index2 = 0; index2 < (*it_storage)[index1].size(); index2++) {
-			if ((*it_storage)[index1][index2].first == iterator->first) {
+		for (int index2 = 0; index2 < (it_table->storage)[index1].size(); index2++) {
+			if ((it_table->storage)[index1][index2].first == iterator->first) {
 				break;
 			}
 		}
-		if (index2 < (*it_storage)[index1].size() - 1)
+		if (index2 < (it_table->storage)[index1].size() - 1)
 			index2++;
 		else {
-			index1 = (index1 + 1) % (*it_storage).size();
-			while ((*it_storage)[index1].size() == 0)
-				index1 = (index1 + 1) % (*it_storage).size();
+			index1 = (index1 + 1) % (it_table->storage).size();
+			while ((it_table->storage)[index1].size() == 0)
+				index1 = (index1 + 1) % (it_table->storage).size();
 			index2 = 0;
 		}
-		iterator = &((*it_storage)[index1][index2]);
+		iterator = &((it_table->storage)[index1][index2]);
 		return *this;
 	}
 	hashIterator& operator--() {
@@ -91,6 +91,7 @@ protected:
 	double percentageFilling = 0;
 	int p = 10103;
 	int q = 10133;
+	friend hashIterator<TypeKey,TypeData>;
 //--------------------------------------------------------------------------------//
 	double calculateAverageCollisions() {
 		double ans = 0;
@@ -220,14 +221,14 @@ public:
 		for (int i = 0; i < storage[index].size(); i++) {
 			if (storage[index][i].first == key) {
 				storage[index][i].second = data;
-				return hashIterator<TypeKey, TypeData>(storage[index][i],storage);
+				return hashIterator<TypeKey, TypeData>(storage[index][i],*this);
 			}
 		}
 		storage[index].push_back(make_pair(key, data));
 		int a = sizeoftable();
 		if (check()) rebalancing(1);
 		index = HashFunction(key) % storage.size();
-		return hashIterator<TypeKey, TypeData>(storage[index].back(),storage);
+		return hashIterator<TypeKey, TypeData>(storage[index].back(),*this);
 	}
 //--------------------------------------------------------------------------------//
 	TypeData& operator[] (const TypeKey& key) { //оператор []
@@ -245,7 +246,7 @@ public:
 		int index = HashFunction(key) % storage.size();
 		for (int i = 0; i < storage[index].size(); i++) {
 			if (storage[index][i].first == key) {
-				return hashIterator<TypeKey, TypeData>(storage[index][i],storage);
+				return hashIterator<TypeKey, TypeData>(storage[index][i],*this);
 			}
 		}
 		return end();
@@ -276,19 +277,19 @@ public:
 	}
 //--------------------------------------------------------------------------------//
 	hashIterator<TypeKey, TypeData> begin() {
-		if (storage.empty()) return hashIterator<TypeKey, TypeData>(storage[storage.size() - 1][0],storage);
+		if (storage.empty()) return hashIterator<TypeKey, TypeData>(storage[storage.size() - 1][0],*this);
 		int index = 0;
 		while (storage[index].size() == 0)
 			index++;
-		return hashIterator<TypeKey, TypeData>(storage[index][0],storage);
+		return hashIterator<TypeKey, TypeData>(storage[index][0],*this);
 	}
 //--------------------------------------------------------------------------------//
 	hashIterator<TypeKey, TypeData> end() {
-		if (storage.empty()) return hashIterator<TypeKey, TypeData>(storage[storage.size() - 1][0],storage);
+		if (storage.empty()) return hashIterator<TypeKey, TypeData>(storage[storage.size() - 1][0],*this);
 		int index = storage.size()-1;
 		while (storage[index].size() == 0)
 			index--;
-		return hashIterator<TypeKey, TypeData>(storage[index][storage[index].size() - 1],storage);
+		return hashIterator<TypeKey, TypeData>(storage[index][storage[index].size() - 1],*this);
 	}
 };
 
