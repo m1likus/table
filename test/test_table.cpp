@@ -358,24 +358,24 @@ TEST(HashTable, create_table_int_int_is_positive_length)
     EXPECT_EQ(a.size(), s);
 }
 
-TEST(HashTable, test_rebalansing)
-{
-    int s = 100;
-    HashTable<int, int> a(s);
-    a.insert(20, 20);
-    a.insert(120, 20);
-    a.insert(21, 20);
-    a.insert(20, 20);
-    for (auto i = a.end(); i != a.begin(); --i) {
-        *i = *i + 1;
-    }
-    //for (auto i = a.begin(); i != a.end(); ++i) {
-    //    ASSERT_NE(*i, *i);
-    //}
-    //cout << a[20];
-    EXPECT_EQ(a.size(), s +1);
-}
 
+TEST(HashTable, test_insert1)
+{
+    int s = 0;
+    int N = 1000;
+    HashTable<int, int> a(s);
+    for (int i = 0; i < N; i++) {
+        a.insert(i, 20);
+    }
+
+    for (auto i = a.begin(); i != a.end(); ++i) {
+        (*i)++;
+    }
+    EXPECT_TRUE(a.size() >= 250);
+    for (int i = 0; i < N; i++) {
+        EXPECT_EQ(a[i], 21);
+    }
+}
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);

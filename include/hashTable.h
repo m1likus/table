@@ -36,6 +36,16 @@ public:
 				break;
 			}
 		}
+		for (int i = it_table->storage.size()-1; i >= 0; i--) {
+			if (it_table->storage[i].size() != 0) {
+				if (it_table->storage[index1][index2] == it_table->storage[i].back()) {
+					iterator = &((it_table->storage)[index1][index2]) + 1;
+					return *this;
+				}
+				else break;
+			}
+		}
+		
 		if (index2 < (it_table->storage)[index1].size() - 1)
 			index2++;
 		else {
@@ -55,6 +65,15 @@ public:
 				break;
 			}
 		}
+		for (int i = 0; i < it_table->storage.size(); i++) {
+			if (it_table->storage[i].size() != 0) {
+				if (it_table->storage[index1][index2] == it_table->storage[i].front()) {
+					iterator = &((it_table->storage)[index1][index2]);
+					return *this;
+				}
+				else break;
+			}
+		}
 		if (index2 > 0)
 			index2--;
 		else {
@@ -69,7 +88,7 @@ public:
 	hashIterator operator+(int offset) {
 		hashIterator<TypeKey, T> tmp = *this;
 		for (int i = 0; i < offset; i++) {
-			tmp++;
+			++tmp;
 		}
 		return tmp;
 	}
@@ -217,6 +236,7 @@ public:
 	}
 //--------------------------------------------------------------------------------//
 	hashIterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& data) {
+		if (size() == 0) rebalancing(1);
 		int index = HashFunction(key) % storage.size();
 		for (int i = 0; i < storage[index].size(); i++) {
 			if (storage[index][i].first == key) {
@@ -286,10 +306,11 @@ public:
 //--------------------------------------------------------------------------------//
 	hashIterator<TypeKey, TypeData> end() {
 		if (storage.empty()) return hashIterator<TypeKey, TypeData>(storage[storage.size() - 1][0],*this);
-		int index = storage.size()-1;
-		while (storage[index].size() == 0)
-			index--;
-		return hashIterator<TypeKey, TypeData>(storage[index][storage[index].size() - 1],*this);
+		//int index = storage.size()-1;
+		//while (storage[index].size() == 0)
+		//	index--;
+		//return hashIterator<TypeKey, TypeData>(storage[index][storage[index].size() - 1],*this)+1;
+		return begin() + sizeoftable();
 	}
 };
 

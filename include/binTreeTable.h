@@ -424,10 +424,35 @@ class binTreeIterator {
 protected:
 	//TODO
 	pair <TypeKey, T>* iterator;
-	BinTreeTable<TypeKey, T>* it_table;
+	BinTreeTable<TypeKey, T>* it_tree;
 public:
-	binTreeIterator(pair<TypeKey, T>& data, BinTreeTable<TypeKey, T>& new_table) {
+	binTreeIterator(pair<TypeKey, T>& data, BinTreeTable<TypeKey, T>& new_tree) {
 		iterator = &data;
-		it_table = &new_table;
+		it_tree = &new_tree;
+	}
+	binTreeIterator(const binTreeIterator& other) {
+		iterator = other.iterator;
+		it_tree = other.it_tree;
+	}
+	T& operator*() const {
+		return iterator->second;
+	}
+	T* operator->() const {
+		return iterator.second;
+	}
+	binTreeIterator& operator++() {
+		return *this;
+	}
+	binTreeIterator& operator--() {
+		return *this;
+	}
+	binTreeIterator operator+() {
+		return this;
+	}
+	bool operator==(const hashIterator& other) {
+		return iterator == other.iterator;
+	}
+	bool operator!=(const hashIterator& other) {
+		return iterator != other.iterator;
 	}
 };
