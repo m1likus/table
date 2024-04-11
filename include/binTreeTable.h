@@ -30,7 +30,7 @@ template <typename TypeKey, typename TypeData>
 class BinTreeTable {
 protected:
 	Node<TypeKey, TypeData>* root;
-	friend binTreeIterator
+	friend binTreeIterator<TypeKey, TypeData>;
 public:
 //--------------------------------------------------------------------------------//
 	BinTreeTable() { //конструктор по умолчанию
@@ -272,7 +272,7 @@ public:
 		}
 		if (n1 == 0)
 			throw "not_found";
-		if (n1->storage.first != key)
+		if (n1->storage.first == key)
 			return n1->storage.second;
 	}
 //--------------------------------------------------------------------------------//
@@ -289,23 +289,8 @@ public:
 //--------------------------------------------------------------------------------//
 	int size() {
 		int count = 0;
-		if (root == 0) return count;
-		Node<TypeKey, TypeData>* n1 = root;
-		Node<TypeKey, TypeData>* n2 = root;
-		while (n2 != 0) {
-			n1 = n2;
-			if (n1->left != 0) {
-				n2 = n1->left;
-				n1->left = 0;
-			}
-			else if (n2->right != 0) {
-				n2 = n1->right;
-				n1->right = 0;
-			}
-			else {
-				n2 = n1->parent;
-				count++;
-			}
+		for (auto i = begin(); i != end(); ++i) {
+			count++;
 		}
 		return count;
 	}
@@ -317,8 +302,7 @@ public:
 			root->left = 0;
 			root->right = 0;
 			root->storage = make_pair(key, d);
-			return binTreeIterator<TypeKey, TypeData>();
-			//return binTreeIterator<TypeKey, TypeData>(root->storage);
+			return binTreeIterator<TypeKey, TypeData>(*root);
 		}
 		else {
 			Node<TypeKey, TypeData>* n1 = root;
@@ -344,7 +328,7 @@ public:
 			else if (n1->storage.first == key) {
 				n1->storage.second = d;
 			}
-			return binTreeIterator<TypeKey, TypeData>();
+			return binTreeIterator<TypeKey, TypeData>(*n1);
 			//return binTreeIterator<TypeKey, TypeData>(n1->storage);
 		}
 	}
@@ -388,32 +372,24 @@ public:
 //--------------------------------------------------------------------------------//
 	//итератор на начало
 	binTreeIterator<TypeKey, TypeData> begin() {
-		if (root = 0) return binTreeIterator<TypeKey, TypeData>(*(root));
+		if (root == 0) return binTreeIterator<TypeKey, TypeData>(*(root));
 		else {
 			Node<TypeKey, TypeData>* n1 = root;
-			Node<TypeKey, TypeData>* n2 = root;
-			while (n2 != 0) {
-				n1 = n2;
-				if (n1->left != 0)
-					n2 = n1->left;
+			while (n1->left != 0) {
+				n1 = n1->left;
 			}
-			return binTreeIterator<TypeKey, TypeData>(*(n2));
+			return binTreeIterator<TypeKey, TypeData>(*(n1));
 		}
 	}
 //--------------------------------------------------------------------------------//
 	//итератор на конец
-	Iterator<TypeKey, TypeData> end() {
-		if (root = 0) return binTreeIterator<TypeKey, TypeData>(*(root));
-		else {
-			Node<TypeKey, TypeData>* n1 = root;
-			Node<TypeKey, TypeData>* n2 = root;
-			while (n2 != 0) {
-				n1 = n2;
-				if (n1->right != 0)
-					n2 = n1->right;
-			}
-			return binTreeIterator<TypeKey, TypeData>(*(n2));
+	binTreeIterator<TypeKey, TypeData> end() {
+		if (root == 0) return binTreeIterator<TypeKey, TypeData>(*(root));
+		Node<TypeKey, TypeData>* n1 = root;
+		while (n1->right != 0) {
+			n1 = n1->right;
 		}
+		return ++binTreeIterator<TypeKey, TypeData>(*(n1));
 	}
 //--------------------------------------------------------------------------------//
 };
@@ -424,15 +400,19 @@ class binTreeIterator {
 protected:
 	//TODO
 	pair <TypeKey, T>* iterator;
-	BinTreeTable<TypeKey, T>* it_tree;
+	Node<TypeKey, T>* it_node;
 public:
-	binTreeIterator(pair<TypeKey, T>& data, BinTreeTable<TypeKey, T>& new_tree) {
+	binTreeIterator(pair<TypeKey, T>& data, Node<TypeKey, T>& new_node) {
 		iterator = &data;
-		it_tree = &new_tree;
+		it_node = &new_node;
+	}
+	binTreeIterator(Node<TypeKey, T>& other) {
+		iterator = &(other.storage);
+		it_node = &other;
 	}
 	binTreeIterator(const binTreeIterator& other) {
 		iterator = other.iterator;
-		it_tree = other.it_tree;
+		it_node = other.it_node;
 	}
 	T& operator*() const {
 		return iterator->second;
@@ -441,18 +421,60 @@ public:
 		return iterator.second;
 	}
 	binTreeIterator& operator++() {
+		if (it_node->right != 0) { //если есть справа, то идем вправо...
+			it_node = it_node->right;
+			while(it_node->left!=0) //если есть слева, то идем влево до конца
+				it_node = it_node->left;
+			iterator = &(it_node->storage);
+		}
+		else {
+			Node<TypeKey, T>* save_node(it_node);
+			while (it_node->parent != 0 && it_node->parent->right == it_node)
+				it_node = it_node->parent; //если мы сейчас в правом сыне, то идем наверх, пока не станем левым сыном или пока не дойдем до корня
+			if (it_node->parent == 0) {//если мы в корне, то возвращаем +1 к последнему
+				it_node = save_node;
+				iterator = &(it_node->storage) + 1;
+			}
+			else if (it_node->parent->left == it_node) { //если мы в левом сыне, то просто переходим к родителю
+				it_node = it_node->parent;
+				iterator = &(it_node->storage);
+			}
+		}
 		return *this;
 	}
 	binTreeIterator& operator--() {
+		if (it_node->left != 0) {//если есть слева, то идем влево...
+			it_node = it_node->left;
+			while (it_node->right != 0)//если есть справа, то идем вправо до конца
+				it_node = it_node->right;
+			iterator = &(it_node->storage);
+		}
+		else {
+			Node<TypeKey, T>* save_node(it_node);
+			while (it_node->parent != 0 && it_node->parent->left == it_node)
+				it_node = it_node->parent;//если мы сейчас в левом сыне, то идем наверх, пока не станем правым сыном или пока не дойдем до корня
+			if (it_node->parent == 0) {//если мы в корне, то просто останемся, тк я не знаю что делать с бегином, по идее эта ситуация не может быть и это "зацита" от ошибок
+				it_node = save_node;
+				iterator = &(it_node->storage);
+			}
+			else if (it_node->parent->right == it_node) {//если мы в правом сыне, то просто переходим к родителю
+				it_node = it_node->parent;
+				iterator = &(it_node->storage);
+			}
+		}
 		return *this;
 	}
 	binTreeIterator operator+() {
-		return this;
+		binTreeIterator<TypeKey, T> tmp = *this;
+		for (int i = 0; i < offset; i++) {
+			++tmp;
+		}
+		return tmp;
 	}
-	bool operator==(const hashIterator& other) {
+	bool operator==(const binTreeIterator& other) {
 		return iterator == other.iterator;
 	}
-	bool operator!=(const hashIterator& other) {
+	bool operator!=(const binTreeIterator& other) {
 		return iterator != other.iterator;
 	}
 };
