@@ -9,7 +9,7 @@ class binTreeIterator;
 template <typename TypeKey, typename TypeData>
 class Node {
 public:
-	pair<TypeData,TypeKey> storage;
+	pair<TypeKey, TypeData> storage;
 	Node* left;
 	Node* right;
 	Node* parent;
@@ -284,7 +284,7 @@ public:
 			else
 				n1 = n1->left;
 		}
-		return Iterator<TypeKey, TypeData>(n1->storage);
+		return binTreeIterator<TypeKey, TypeData>(*n1);
 	}
 //--------------------------------------------------------------------------------//
 	int size() {
@@ -355,7 +355,11 @@ public:
 			}
 			else
 				nr = n1->left;
-			if (n1->parent == 0) {
+			if (nr == 0) {
+				root = nr;
+				return true;
+			}
+			else if (n1->parent == 0) {
 				nr->parent = 0;
 				root = nr;
 			}
