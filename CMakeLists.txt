@@ -21,7 +21,7 @@ include_directories("${MP2_INCLUDE}" gtest)
 #BUILD
 add_subdirectory(gtest)
 add_subdirectory(test)
-add_executable (table src/main.cpp include/table.h include/sortTable.h include/hashTable.h include/binTreeTable.h)
+add_executable (table src/main.cpp include/table.h include/sortTable.h include/hashTable.h include/binTreeTable.h include/avlTreeTable.h)
 
 # REPORT
 message( STATUS "")
