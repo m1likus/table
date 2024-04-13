@@ -13,6 +13,7 @@ public:
 	Node* left;
 	Node* right;
 	Node* parent;
+	int height;
 
 	bool operator==(const Node& other) {
 		if (key == other.key && data == other.data)
@@ -357,7 +358,6 @@ public:
 				nr = n1->left;
 			if (nr == 0) {
 				root = nr;
-				return true;
 			}
 			else if (n1->parent == 0) {
 				nr->parent = 0;
