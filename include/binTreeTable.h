@@ -285,7 +285,7 @@ public:
 			else
 				n1 = n1->left;
 		}
-		return binTreeIterator<TypeKey, TypeData>(*n1);
+		return binTreeIterator<TypeKey, TypeData>(*n1, *this);
 	}
 //--------------------------------------------------------------------------------//
 	int size() {
@@ -303,7 +303,7 @@ public:
 			root->left = 0;
 			root->right = 0;
 			root->storage = make_pair(key, d);
-			return binTreeIterator<TypeKey, TypeData>(*root);
+			return binTreeIterator<TypeKey, TypeData>(*root,*this);
 		}
 		else {
 			Node<TypeKey, TypeData>* n1 = root;
@@ -329,7 +329,7 @@ public:
 			else if (n1->storage.first == key) {
 				n1->storage.second = d;
 			}
-			return binTreeIterator<TypeKey, TypeData>(*n1);
+			return binTreeIterator<TypeKey, TypeData>(*n1,*this);
 			//return binTreeIterator<TypeKey, TypeData>(n1->storage);
 		}
 	}
@@ -386,24 +386,24 @@ public:
 //--------------------------------------------------------------------------------//
 	//итератор на начало
 	binTreeIterator<TypeKey, TypeData> begin() {
-		if (root == 0) return binTreeIterator<TypeKey, TypeData>(*(root));
+		if (root == 0) return binTreeIterator<TypeKey, TypeData>(*root, *this);
 		else {
 			Node<TypeKey, TypeData>* n1 = root;
 			while (n1->left != 0) {
 				n1 = n1->left;
 			}
-			return binTreeIterator<TypeKey, TypeData>(*(n1));
+			return binTreeIterator<TypeKey, TypeData>(*(n1), *this);
 		}
 	}
 //--------------------------------------------------------------------------------//
 	//итератор на конец
 	binTreeIterator<TypeKey, TypeData> end() {
-		if (root == 0) return binTreeIterator<TypeKey, TypeData>(*(root));
+		if (root == 0) return binTreeIterator<TypeKey, TypeData>(*root, *this);
 		Node<TypeKey, TypeData>* n1 = root;
 		while (n1->right != 0) {
 			n1 = n1->right;
 		}
-		return ++binTreeIterator<TypeKey, TypeData>(*(n1));
+		return ++binTreeIterator<TypeKey, TypeData>(*n1, *this);
 	}
 //--------------------------------------------------------------------------------//
 	int getHeight() {
@@ -452,21 +452,19 @@ public:
 template <typename TypeKey, typename T>
 class binTreeIterator {
 protected:
-	//TODO
 	pair <TypeKey, T>* iterator;
 	Node<TypeKey, T>* it_node;
+	BinTreeTable<TypeKey, T>* it_tree;
 public:
-	binTreeIterator(pair<TypeKey, T>& data, Node<TypeKey, T>& new_node) {
+	binTreeIterator(pair<TypeKey, T>& data, Node<TypeKey, T>& new_node, BinTreeTable<TypeKey, T>& tree) {
 		iterator = &data;
 		it_node = &new_node;
+		it_tree = &tree;
 	}
-	binTreeIterator(Node<TypeKey, T>& other) {
+	binTreeIterator(Node<TypeKey, T>& other, BinTreeTable<TypeKey, T>& other_tree) {
 		iterator = &(other.storage);
 		it_node = &other;
-	}
-	binTreeIterator(const binTreeIterator& other) {
-		iterator = other.iterator;
-		it_node = other.it_node;
+		it_tree = &other_tree;
 	}
 	T& operator*() const {
 		return iterator->second;
@@ -474,6 +472,7 @@ public:
 	T* operator->() const {
 		return iterator.second;
 	}
+
 	binTreeIterator& operator++() {
 		if (it_node->right != 0) { //если есть справа, то идем вправо...
 			it_node = it_node->right;
@@ -497,7 +496,15 @@ public:
 		return *this;
 	}
 	binTreeIterator& operator--() {
-		if (it_node->left != 0) {//если есть слева, то идем влево...
+		if (this->it_node == nullptr) {
+			if (it_tree->root == 0) return binTreeIterator<TypeKey, T>(*it_tree->root, *it_tree);
+			Node<TypeKey, T>* n1 = it_tree->root;
+			while (n1->right != 0) {
+				n1 = n1->right;
+			}
+			iterator = &(n1->storage);
+		}
+		else if (it_node->left != 0) {//если есть слева, то идем влево...
 			it_node = it_node->left;
 			while (it_node->right != 0)//если есть справа, то идем вправо до конца
 				it_node = it_node->right;

@@ -276,7 +276,7 @@ public:
 			root->right = 0;
 			root->storage = make_pair(key, d);
 			root->height = 0;
-			return binTreeIterator<TypeKey, TypeData>(*root);
+			return binTreeIterator<TypeKey, TypeData>(*root, *this);
 		}
 		else {
 			Node<TypeKey, TypeData>* n1 = root;
@@ -303,7 +303,7 @@ public:
 			else if (n1->storage.first == key) {
 				n1->storage.second = d;
 			}
-			return binTreeIterator<TypeKey, TypeData>(*n1);
+			return binTreeIterator<TypeKey, TypeData>(*n1,*this);
 			//return binTreeIterator<TypeKey, TypeData>(n1->storage);
 		}
 	}

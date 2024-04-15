@@ -556,7 +556,7 @@ TEST(BinTreeTable, test_insert_and_remove_while) {
     mt19937 g(rd());
     std::shuffle(vec_insert.begin(), vec_insert.end(), g);
     BinTreeTable<int, int> a;
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < binTreeN; i++) {
         a.insert(vec_insert[i], vec_insert[i]);
         vec_remove.push_back(vec_insert[i]);
         swap(vec_insert[i],vec_insert[vec_insert.size()-1]);
@@ -584,7 +584,18 @@ TEST(BinTreeTable, test_insert_and_remove_while) {
     }
     cout<< "\nTotal cycles of inserting and removing: " << count << endl;
     ASSERT_EQ(a.size(), binTreeN);
-    //EXPECT_LE(count,100000);
+}
+
+TEST(BinTreeTable, test_111)
+{
+    BinTreeTable<int, int> a;
+    a.insert(1,1);
+
+    auto i = a.end();
+    --i;
+    auto j =a.begin();
+    EXPECT_EQ(*i,*j);
+    
 }
 //--------------------------------------------------------------------------------//
 TEST(AvlTreeTable, get_data_by_key_string)
