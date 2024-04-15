@@ -5,9 +5,19 @@
 template <typename TypeKey, typename TypeData>
 class AvlTreeTable : public BinTreeTable<TypeKey, TypeData> {
 private:
-	void calculateHeight() {
-		if (this->root == 0) this->root->height = 0;
-		else {
+	void calculateHeight(Node<TypeKey, TypeData>* n) {
+		Node<TypeKey, TypeData>* n1 = n;//?
+		while (n1->parent != 0) {
+			int hr = 0, hl = 0;
+			if (n1->right != 0) hr = n1->right->height;
+			if (n1->left != 0) hl = n1->left->height;
+			n1->height = my_max(hr, hl);
+			n1 = check(n1);
+			n1 = n1->parent;
+		}
+		
+		//if (this->root == 0) this->root->height = 0;
+		//else {
 
 			//вариант1: сначала пройтись по всем нижним узлам, расставить нули
 			//дальше подниматься на один уровень вверх, брать максимум от высот потомков
@@ -23,13 +33,29 @@ private:
 			// либо пойти снизу вверх?
 			//вариант3: двигаться от begin, возможно с помощью итератора?
 			//проблема: движение итератора идет от большего к меньшему
-		}
+		//}
 	}
 
-	void check(Node<TypeKey, TypeData>& n) {
+	Node<TypeKey, TypeData>* check(Node<TypeKey, TypeData>* n) {
+		Node<TypeKey, TypeData>* n1 = n;
+		int hr = 0, hl = 0;
+		if (n1->right != 0) hr = n1->right->height;
+		if (n1->left != 0) hl = n1->left->height;
+		int delta = hl - hr;
+		if (delta < -1) {
+			return n1;
+		}
+		if (delta > -1) {
+			return n1;
+		}
 		//мы передаем ноду, которую добавили или отца удаленной ноды или ноду, у которой точно поменяется высота
 		//тут происходит пересчет высот от нашей ноды
 		//при пересчете принимаем решение на повороты
+	}
+
+	int my_max(int a, int b) {
+		if (a >= b)return a;
+		else return b;
 	}
 public:
 //--------------------------------------------------------------------------------//
@@ -272,7 +298,7 @@ public:
 					n2->right = n1;
 				else
 					n2->left = n1;
-				check(*n1);
+				calculateHeight(n1);
 			}
 			else if (n1->storage.first == key) {
 				n1->storage.second = d;
@@ -312,7 +338,7 @@ public:
 			else if (n1->parent == 0) {
 				nr->parent = 0;
 				root = nr;
-				check(*root);//изменился корень, надо поменять только у него
+				calculateHeight(root);//изменился корень, надо поменять только у него
 			}
 			else {
 				nr->parent = n1->parent;
@@ -322,8 +348,8 @@ public:
 				else {
 					n1->parent->right = nr;
 				}
-				if (startCheck == 0) check(*(nr->parent));//если начальное значение, то значит глубоко мы не меняли, начинаем с отца удаленной ноды
-				else check(*startCheck);//иначе начиаем с глубокого места изменения
+				if (startCheck == 0) calculateHeight(nr->parent);//если начальное значение, то значит глубоко мы не меняли, начинаем с отца удаленной ноды
+				else calculateHeight(startCheck);//иначе начиаем с глубокого места изменения
 			}
 			return true;
 		}
