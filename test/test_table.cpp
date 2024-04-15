@@ -582,7 +582,7 @@ TEST(BinTreeTable, test_insert_and_remove_while) {
         }
         treeHeight = a.getHeight();
     }
-    cout<< "\nTotal cycles of inserting and removing: " << count << endl;
+    cout<< "Total cycles of inserting and removing: " << count << endl;
     ASSERT_EQ(a.size(), binTreeN);
 }
 
