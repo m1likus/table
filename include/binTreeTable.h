@@ -335,37 +335,47 @@ public:
 	}
 //--------------------------------------------------------------------------------//
 	bool remove(const TypeKey& key) {
-		Node<TypeKey, TypeData>* n1 = root;
-		while (n1 != 0 && n1->storage.first != key) {
-			if (n1->storage.first < key)
-				n1 = n1->right;
+		Node<TypeKey, TypeData>* n1 = root; //начинаем с корня
+		while (n1 != 0 && n1->storage.first != key) { //пока куда идем !=0 и не равно ключу
+			if (n1->storage.first < key) //если искомый ключ больше ключа в узле n1
+				n1 = n1->right; //идем направо
 			else
-				n1 = n1->left;
+				n1 = n1->left; //иначе налево
 		}
-		if (n1 == 0)
+		if (n1 == 0) //если пусто, то не можем удалить
 			return false;
-		if (n1->storage.first == key) {
-			Node<TypeKey, TypeData>* nr;
-			if (n1->right != 0) {
-				nr = n1->right;
-				Node<TypeKey, TypeData>* n2 = nr;
-				while (n2->left != 0)
-					n2 = n2->left;
-				n2->left = n1->left;
-				n1->left->parent = n2;
+		if (n1->storage.first == key) { //если нашли
+			Node<TypeKey, TypeData>* nr = 0; //делаем все через правого потомка
+			if (n1->right != 0) { //если у n1 правый потомок !=0
+				nr = n1->right; //переходим в этого правого потомка
+				Node<TypeKey, TypeData>* n2 = nr; //и создаем еще узел
+				while (n2->left != 0) //
+					n2 = n2->left; //переходим в него
+				n2->left = n1->left; //
+				if(n1->left!=0)
+					n1->left->parent = n2;
 			}
-			else
+			else if(n1->left != 0)
 				nr = n1->left;
-			if (nr == 0) {
-				root = nr;
-			}
+			
+			if (nr==0)
+				if (n1->parent != 0) {
+					if (n1->parent->left != 0 && n1->parent->left->storage.first == key)
+						n1->parent->left = nr;
+					else
+						n1->parent->right = nr;
+					return true;
+				}
+				else {
+					root = 0;
+				}
 			else if (n1->parent == 0) {
 				nr->parent = 0;
 				root = nr;
 			}
 			else {
 				nr->parent = n1->parent;
-				if (n1->parent->left->storage.first == key)
+				if (n1->parent->left!=0 && n1->parent->left->storage.first == key)
 					n1->parent->left = nr;
 				else
 					n1->parent->right = nr;
@@ -396,6 +406,46 @@ public:
 		return ++binTreeIterator<TypeKey, TypeData>(*(n1));
 	}
 //--------------------------------------------------------------------------------//
+	int getHeight() {
+		int h = 0;
+		int max_h = 0;
+		Node<TypeKey, TypeData>* n = root;
+		while (n->left != 0) {
+			n = n->left;
+			h++;
+		}
+		if (h > max_h) max_h = h;
+		//копирую ++
+		while (true) {
+			Node<TypeKey, TypeData>* it_node = n;
+			if (it_node->right != 0) { //если есть справа, то идем вправо...
+				it_node = it_node->right;
+				h++;
+				while (it_node->left != 0) {//если есть слева, то идем влево до конца
+					it_node = it_node->left;
+					h++;
+				}
+			}
+			else {
+				Node<TypeKey, TypeData>* save_node(it_node);
+				while (it_node->parent != 0 && it_node->parent->right == it_node) {
+					it_node = it_node->parent; //если мы сейчас в правом сыне, то идем наверх, пока не станем левым сыном или пока не дойдем до корня
+					h--;
+				}
+				if (it_node->parent == 0) {//если мы в корне, то возвращаем +1 к последнему
+					it_node = save_node;
+					break;
+				}
+				else if (it_node->parent->left == it_node) { //если мы в левом сыне, то просто переходим к родителю
+					it_node = it_node->parent;
+					h--;
+				}
+			}
+			n = it_node;
+			if (h > max_h) max_h = h;
+		}
+		return max_h;
+	}
 };
 
 

@@ -1,4 +1,7 @@
 #include <iostream>
+#include <random>
+#include <vector>
+#include <algorithm>
 #include "table.h"
 #include "sortTable.h"
 #include "hashTable.h"
@@ -10,12 +13,17 @@ using namespace std;
 
 
 int main() {
-    int data = 10;
-    BinTreeTable<string, int> a;
-    a.insert("key", data);
-    a.insert("key + 1", data + 1);
-    a.insert("key - 1", data - 1);
-
-    cout<<(a["key"]== data);
-	return 0;
+    int N = 1000;
+    vector<int> b(N);
+    for (int i = 0; i < N; i++) {
+        b[i] = i;
+    }
+    random_device rd;
+    mt19937 g(rd());
+    std::shuffle(b.begin(), b.end(), g);
+    BinTreeTable<int, int> a;
+    for (int i = 0; i < N; i++) {
+        a.insert(b[i], b[i]);
+    }
+    cout << a.getHeight();
 }

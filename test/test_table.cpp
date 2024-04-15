@@ -1,4 +1,7 @@
 #include <gtest.h>
+#include <algorithm>
+#include <random>
+#include <vector>
 #include "table.h"
 #include "sortTable.h"
 #include "hashTable.h"
@@ -480,9 +483,8 @@ TEST(BinTreeTable, remove_false)
     EXPECT_EQ(x, false);
 }
 
-TEST(BinTreeTable, test_insert1)
+TEST(BinTreeTable, test_insert_with_iterators)
 {
-    int s = 0;
     int N = 1000;
     vector<bool> b(N);
     BinTreeTable<int, int> a;
@@ -503,6 +505,86 @@ TEST(BinTreeTable, test_insert1)
     for (int i = 0; i < N; i++) {
         EXPECT_EQ(a[i], 21);
     }
+}
+
+TEST(BinTreeTable, test_insert_1000elements) {
+    int N = 1000;
+    vector<int> b(N);
+    for (int i = 0; i < N; i++) {
+        b[i] = i;
+    }
+    random_device rd;
+    mt19937 g(rd());
+    std::shuffle(b.begin(), b.end(), g);
+
+    BinTreeTable<int, int> a;
+    for (int i = 0; i < N; i++) {
+        ASSERT_NO_THROW(a.insert(b[i], b[i]));
+    }
+    ASSERT_EQ(a.size(), N);
+}
+
+TEST(BinTreeTable, test_remove_1000elements) {
+    int N = 1000;
+    vector<int> b(N);
+    for (int i = 0; i < N; i++) {
+        b[i] = i;
+    }
+    random_device rd;
+    mt19937 g(rd());
+    std::shuffle(b.begin(), b.end(), g);
+    BinTreeTable<int, int> a;
+    for (int i = 0; i < N; i++) {
+        a.insert(b[i], b[i]);
+    }
+    std::shuffle(b.begin(), b.end(), g);
+    for (int i = 0; i < N; i++) {
+        EXPECT_EQ(a.remove(b[i]), true);
+    }
+    ASSERT_EQ(a.size(), 0);
+}
+
+TEST(BinTreeTable, test_insert_and_remove_while) {
+    int binTreeN = 1000;
+    int N = 2000;
+    vector<int> vec_insert(N);
+    vector<int> vec_remove;
+    for (int i = 0; i < N; i++) {
+        vec_insert[i] = i;
+    }
+    random_device rd;
+    mt19937 g(rd());
+    std::shuffle(vec_insert.begin(), vec_insert.end(), g);
+    BinTreeTable<int, int> a;
+    for (int i = 0; i < 1000; i++) {
+        a.insert(vec_insert[i], vec_insert[i]);
+        vec_remove.push_back(vec_insert[i]);
+        swap(vec_insert[i],vec_insert[vec_insert.size()-1]);
+        vec_insert.pop_back();
+    }
+    int startTreeHeight = a.getHeight(), treeHeight = startTreeHeight;
+    int count = 0;
+    while((treeHeight - startTreeHeight)<10){
+        count++;
+        std::shuffle(vec_insert.begin(), vec_insert.end(), g);
+        std::shuffle(vec_remove.begin(), vec_remove.end(), g);
+        for(int i = 0; i < 100; i++){
+            a.insert(vec_insert[i], vec_insert[i]);
+            vec_remove.push_back(vec_insert[i]);
+            swap(vec_insert[i],vec_insert[vec_insert.size()-1]);
+            vec_insert.pop_back();
+        }
+        for(int i = 0; i < 100; i++){
+            a.remove(vec_remove[i]);
+            vec_insert.push_back(vec_remove[i]);
+            swap(vec_remove[i],vec_remove[vec_remove.size()-1]);
+            vec_remove.pop_back();
+        }
+        treeHeight = a.getHeight();
+    }
+    cout<< "\nTotal cycles of inserting and removing: " << count << endl;
+    ASSERT_EQ(a.size(), binTreeN);
+    //EXPECT_LE(count,100000);
 }
 //--------------------------------------------------------------------------------//
 TEST(AvlTreeTable, get_data_by_key_string)
@@ -631,6 +713,8 @@ TEST(AvlTreeTable, test_insert1)
         EXPECT_EQ(a[i], 21);
     }
 }
+
+
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
