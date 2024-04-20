@@ -1,5 +1,4 @@
 #pragma once
-
 #include <string>
 #include "table.h"
 
@@ -329,8 +328,7 @@ public:
 			else if (n1->storage.first == key) {
 				n1->storage.second = d;
 			}
-			return binTreeIterator<TypeKey, TypeData>(*n1,*this);
-			//return binTreeIterator<TypeKey, TypeData>(n1->storage);
+			return binTreeIterator<TypeKey, TypeData>(*n1, *this);
 		}
 	}
 //--------------------------------------------------------------------------------//
@@ -406,22 +404,23 @@ public:
 		return ++binTreeIterator<TypeKey, TypeData>(*n1, *this);
 	}
 //--------------------------------------------------------------------------------//
-	int getHeight() {
-		int h = 0;
+	int getHeight() { //высота для всего дерева
+		int h = 0; 
 		int max_h = 0;
 		Node<TypeKey, TypeData>* n = root;
-		while (n->left != 0) {
+		while (n->left != 0) { //идем до самого маленького
 			n = n->left;
-			h++;
+			h++; //пока идем туда - высота растет
 		}
-		if (h > max_h) max_h = h;
+		if (h > max_h) max_h = h; 
 		//копирую ++
 		while (true) {
 			Node<TypeKey, TypeData>* it_node = n;
-			if (it_node->right != 0) { //если есть справа, то идем вправо...
+			//идем вниз пока можем
+			if (it_node->right != 0) { 
 				it_node = it_node->right;
 				h++;
-				while (it_node->left != 0) {//если есть слева, то идем влево до конца
+				while (it_node->left != 0) {
 					it_node = it_node->left;
 					h++;
 				}

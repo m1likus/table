@@ -6,7 +6,45 @@ template <typename TypeKey, typename TypeData>
 class AvlTreeTable : public BinTreeTable<TypeKey, TypeData> {
 private:
 	void calculateHeight(Node<TypeKey, TypeData>* n) {
-		Node<TypeKey, TypeData>* n1 = n;//?
+		Node<TypeKey, TypeData>* n1 = n;
+		int h = 0;
+		int max_h = 0;
+		while (n1->left != 0) {
+			n1 = n1_left;
+			h++;
+		}
+		if (h > max_h) max_h = h;
+		while (true) {
+			Node<TypeKey, TypeData>* it_node = n1;
+			if (it_node->right != 0) {
+				it_node = it_node->right;
+				h++;
+				while (it_node->left != 0) {
+					it_node = it_node->left;
+					h++;
+				}
+			}
+			else {
+				Node<TypeKey, TypeData>* save_node(it_node);
+				while (it_node->parent != 0 && it_node->parent->right == it_node) {
+					it_node = it_node->parent; 
+					h--;
+				}
+				if (it_node->parent == 0) {
+					it_node = save_node;
+					break;
+				}
+				else if (it_node->parent->left == it_node) {
+					it_node = it_node->parent;
+					h--;
+				}
+			}
+			n1 = it_node;
+			if (h > max_h) max_h = h;
+		}
+		Node<TypeKey, TypeData>n1->height = h;
+
+		/*Node<TypeKey, TypeData>* n1 = n;
 		while (n1->parent != 0) {
 			int hr = 0, hl = 0;
 			if (n1->right != 0) hr = n1->right->height;
@@ -14,26 +52,7 @@ private:
 			n1->height = my_max(hr, hl);
 			n1 = check(n1);
 			n1 = n1->parent;
-		}
-		
-		//if (this->root == 0) this->root->height = 0;
-		//else {
-
-			//вариант1: сначала пройтись по всем нижним узлам, расставить нули
-			//дальше подниматься на один уровень вверх, брать максимум от высот потомков
-			//проблема в проходке по этажам
-			//вариант2: реверснуть рассчитывание высот, рассчитать с корня, потом 
-			//развернуть рассчитанные высоты
-			//проблема: как развернуть? есть ли какая-то формула?
-			// ко 2варианту: создать tmp с помощью конструктора копирования,
-			// расставить в нем высоты сверху вниз
-			// свапнуть высоты корня и узлов, у которых нет потомков
-			// корню присвоить максимум из высот тех узлов
-			// свапнуть следующие два этажа?
-			// либо пойти снизу вверх?
-			//вариант3: двигаться от begin, возможно с помощью итератора?
-			//проблема: движение итератора идет от большего к меньшему
-		//}
+		}*/
 	}
 
 	Node<TypeKey, TypeData>* check(Node<TypeKey, TypeData>* n) {
