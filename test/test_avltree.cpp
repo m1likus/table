@@ -130,3 +130,15 @@ TEST(AvlTreeTable, test_insert1)
         EXPECT_EQ(a[i], 21);
     }
 }
+//работает
+//TEST(AvlTreeTable, getHeight) {
+//    AvlTreeTable<int, int> a;
+//    a.insert(10,10);
+//    a.insert(5, 5);
+//    a.insert(15, 15);
+//    a.insert(0, 0);
+//    a.insert(7, 7);
+//    int height = 2;
+//    int treeHeight = a.giveHeight();
+//    EXPECT_EQ(treeHeight, height);
+//}

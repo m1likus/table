@@ -1,60 +1,17 @@
 #pragma once
-
 #include "binTreeTable.h"
 
 template <typename TypeKey, typename TypeData>
 class AvlTreeTable : public BinTreeTable<TypeKey, TypeData> {
+
 private:
-	void calculateHeight(Node<TypeKey, TypeData>* n) {
-		Node<TypeKey, TypeData>* n1 = n;
-		int h = 0;
-		int max_h = 0;
-		while (n1->left != 0) {
-			n1 = n1_left;
-			h++;
-		}
-		if (h > max_h) max_h = h;
-		while (true) {
-			Node<TypeKey, TypeData>* it_node = n1;
-			if (it_node->right != 0) {
-				it_node = it_node->right;
-				h++;
-				while (it_node->left != 0) {
-					it_node = it_node->left;
-					h++;
-				}
-			}
-			else {
-				Node<TypeKey, TypeData>* save_node(it_node);
-				while (it_node->parent != 0 && it_node->parent->right == it_node) {
-					it_node = it_node->parent; 
-					h--;
-				}
-				if (it_node->parent == 0) {
-					it_node = save_node;
-					break;
-				}
-				else if (it_node->parent->left == it_node) {
-					it_node = it_node->parent;
-					h--;
-				}
-			}
-			n1 = it_node;
-			if (h > max_h) max_h = h;
-		}
-		Node<TypeKey, TypeData>n1->height = h;
+	int calculateHeight(Node<TypeKey,TypeData>*n) {
+		if (n == 0) return -1;
 
-		/*Node<TypeKey, TypeData>* n1 = n;
-		while (n1->parent != 0) {
-			int hr = 0, hl = 0;
-			if (n1->right != 0) hr = n1->right->height;
-			if (n1->left != 0) hl = n1->left->height;
-			n1->height = my_max(hr, hl);
-			n1 = check(n1);
-			n1 = n1->parent;
-		}*/
+		int lh = calculateHeight(n->left);
+		int rh = calculateHeight(n->right);
+		return lh > rh ? lh = lh + 1 : rh = rh + 1;
 	}
-
 	Node<TypeKey, TypeData>* check(Node<TypeKey, TypeData>* n) {
 		Node<TypeKey, TypeData>* n1 = n;
 		int hr = 0, hl = 0;
@@ -73,11 +30,12 @@ private:
 	}
 
 	int my_max(int a, int b) {
-		if (a >= b)return a;
+		if (a >= b) return a;
 		else return b;
 	}
+
 public:
-//--------------------------------------------------------------------------------//
+
 	AvlTreeTable() { //конструктор по умолчанию
 		root = 0;
 	}
@@ -317,7 +275,7 @@ public:
 					n2->right = n1;
 				else
 					n2->left = n1;
-				calculateHeight(n1);
+				calculateHeight();
 			}
 			else if (n1->storage.first == key) {
 				n1->storage.second = d;
@@ -375,3 +333,59 @@ public:
 	}
 //--------------------------------------------------------------------------------//
 };
+/*Node<TypeKey, TypeData>* n1 = n;
+while (n1->parent != 0) {
+	int hr = 0, hl = 0;
+	if (n1->right != 0) hr = n1->right->height;
+	if (n1->left != 0) hl = n1->left->height;
+	n1->height = my_max(hr, hl);
+	n1 = check(n1);
+	n1 = n1->parent;
+}*/
+
+
+//рабочий вариант, но работает скорее всего долго
+		/*Node<TypeKey, TypeData>* n1 = n;
+		int h = 0;
+		int max_h = 0;
+		while (n1->left != 0) {
+			n1 = n1->left;
+			h++;
+		}
+		if (h > max_h) max_h = h;
+		while (true) {
+			Node<TypeKey, TypeData>* it_node = n1;
+			if (it_node->right != 0) {
+				it_node = it_node->right;
+				h++;
+				while (it_node->left != 0) {
+					it_node = it_node->left;
+					h++;
+				}
+			}
+			else {
+				Node<TypeKey, TypeData>* save_node(it_node);
+				while (it_node->parent != 0 && it_node->parent->right == it_node) {
+					it_node = it_node->parent;
+					h--;
+				}
+				if (it_node->parent == 0) {
+					it_node = save_node;
+					break;
+				}
+				else if (it_node->parent->left == it_node) {
+					it_node = it_node->parent;
+					h--;
+				}
+			}
+			n1 = it_node;
+			if (h > max_h) max_h = h;
+		}
+		return max_h;*/
+
+	//void getHeightTree() {
+	//	auto i = this->begin();
+	//	for (i; i != a.end(); ++i) {
+	//		i->it_node->height = calculateHeight(i->it_node);
+	//	}
+	//}

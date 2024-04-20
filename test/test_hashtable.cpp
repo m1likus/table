@@ -158,3 +158,4 @@ TEST(HashTable, test_insert1)
     for (int i = 0; i < N; i++) {
         EXPECT_EQ(a[i], 21);
     }
+}

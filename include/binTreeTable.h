@@ -408,15 +408,13 @@ public:
 		int h = 0; 
 		int max_h = 0;
 		Node<TypeKey, TypeData>* n = root;
-		while (n->left != 0) { //идем до самого маленького
+		while (n->left != 0) {
 			n = n->left;
-			h++; //пока идем туда - высота растет
+			h++;
 		}
 		if (h > max_h) max_h = h; 
-		//копирую ++
 		while (true) {
 			Node<TypeKey, TypeData>* it_node = n;
-			//идем вниз пока можем
 			if (it_node->right != 0) { 
 				it_node = it_node->right;
 				h++;
