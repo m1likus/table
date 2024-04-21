@@ -4,56 +4,89 @@
 template <typename TypeKey, typename TypeData>
 class AvlTreeTable : public BinTreeTable<TypeKey, TypeData> {
 private:
-	Node<TypeKey, TypeData>* smallRight(Node<TypeKey, TypeData>* n) {}
-	Node<TypeKey, TypeData>* smallLeft(Node<TypeKey, TypeData>* n) {}
-	Node<TypeKey, TypeData>* bigRight(Node<TypeKey, TypeData>* n) {}
-	Node<TypeKey, TypeData>* bigLeft(Node<TypeKey, TypeData>* n) {}
+	int recorrect(Node<TypeKey, TypeData>* n) {
+		int rh = 0, lh = 0;
+		n->right != 0 ? rh = n->right->height : rh = 0 ;
+		n->left != 0 ? lh = n->left->height : lh = 0;
+		return lh + rh;
+	}
+	void smallRight(Node<TypeKey, TypeData>* a) {
+		Node<TypeKey, TypeData>* b = a->left;
+		a->left = b->right;
+		b->right = a;
+		recorrect(a);
+		recorrect(b);
 
+	}
+	void smallLeft(Node<TypeKey, TypeData>* a) {
+		Node<TypeKey, TypeData>* b = a->right;
+		a->right = b->left;
+		b->left = a;
+		recorrect(a);
+		recorrect(b);
+	}
+	void bigRight(Node<TypeKey, TypeData>* a) {
+		smallLeft(a->left);
+		smallRight(a);
+	}
+	void bigLeft(Node<TypeKey, TypeData>* a) {
+		smallRight(a->right);
+		smallLeft(a);
+	}
 
 	int difference(Node<TypeKey, TypeData>* n) {
 		int rh = 0, lh = 0;
-		n->right != 0 ? rh = n->right->height;
-		n->left != 0 ? lh = n->left->height;
+		n->right != 0 ? rh = n->right->height : rh = 0 ;
+		n->left != 0 ? lh = n->left->height : lh = 0;
 		return lh - rh;
 	}
-
 	void rebalance(Node<TypeKey, TypeData>* n) {
-		Node<TypeKey, TypeData>* c = n;
+		//всего учитывается 3 верш., чтобы можно было сделать как малый, так и большой поворот
+		Node<TypeKey, TypeData>* c = n; 
 		Node<TypeKey, TypeData>* b = c->parent;
-		//b->parent != 0 ? Node<TypeKey, TypeData>* a = b->parent; //для большого поворота
-
-		do {
+		//первый цикл с малыми поворотами, используется 2 верш
+		while(c!=0 && b!=0){
 			int diff_c = difference(c);
 			int diff_b = difference(b);
 
-			if ((diff_b == -1 || diff_b == 0) && diff_a == -2) {
-				smallLeft();
+			if ((diff_c == -1 || diff_c == 0) && diff_b == -2) {
+				smallLeft(b);
 				return;
 			}
-			else if ((diff_b == 1 || diff_b == 0) && diff_a == 2) {
-				smallRight();
+			else if ((diff_c == 1 || diff_c == 0) && diff_b == 2) {
+				smallRight(b);
 				return;
 			}
+			//делаем переход на 1 этаж вверх
 			c = b;
 			b = b->parent;
-		} while (b!=0);
+		}  
+		//обнуляем ситуацию
+		c = n;
+		b = c->parent;
+		//вводим 3тью верш. 
+		// a==0 - ребалансировка уже не нужна, тк мы в корне и малые не пригодились
+		Node<TypeKey, TypeData>* a = b->parent;;
+		if (a == 0) return;
+		//проходим еще раз с переданной верш.
+		while(c!=0 && b!=0 && a!=0){
+			int diff_c = difference(c);
+			int diff_b = difference(b);
+			int diff_a = difference(a);
 
-		do {
-			c = n;
-			b = c->parent;
-			b->parent != 0 ? Node<TypeKey, TypeData>* a = b->parent : return;
-
-
-		} while (a!=0);
-
-
-
-		//if (diff_b < -1) {
-		//	return b;
-		//}
-		//if (diff_b  > -1) {
-		//	return b;
-		//}
+			if (diff_c <= 1 && diff_b == 1 && diff_a == -2) {
+				bigLeft(a);
+				return;
+			}
+			else if (diff_c <= 1 && diff_b == -1 && diff_a == 2) {
+				bigRight(a);
+				return;
+			}
+			//делаем переход на 1 этаж вверх
+			c = b;
+			b = a;
+			a = a ->parent;
+		}
 	}
 
 public:
@@ -282,15 +315,8 @@ public:
 			while (n1 != 0 && n1->storage.first != key) {
 				n2 = n1;
 				n1->storage.first < key ? n1 = n1->right : n1 = n1->left;
-				/*if (n1->storage.first < key)
-					n1 = n1->right;
-				else
-					n1 = n1->left;*/
 			}
-			if (n1->storage.first == key) {
-				n1->storage.second = d;
-			}
-			else if (n1 == 0) {
+			if (n1 == 0) {
 				n1 = new Node<TypeKey, TypeData>();
 				n1->storage = make_pair(key, d);
 				n1->left = 0;
@@ -301,28 +327,23 @@ public:
 					n2->right = n1;
 				else
 					n2->left = n1;
-				rebalance(n2); // начинаем с отца, тк с n1 - бесполезно
+				rebalance(n1);
 			}
-			
 			return binTreeIterator<TypeKey, TypeData>(*n1,*this);
 		}
 	}
 //--------------------------------------------------------------------------------//
-	bool remove(const TypeKey& key) {//наверное, его надо переписать, а то очень плохо выйдет, но это не точно, ещё подумаю
+	bool remove(const TypeKey& key) {
 		Node<TypeKey, TypeData>* n1 = root;
-		Node<TypeKey, TypeData>* startCheck = 0;//чтобы не искать где мы удалили, мы запоминаем где начинать проверку check
-		while (n1 != 0 && n1->storage.first != key) {//ищем нужную ноду по ключу
-			if (n1->storage.first < key)
-				n1 = n1->right;
-			else
-				n1 = n1->left;
-		}
-		if (n1 == 0) //если такого ключа нет, то false
+		Node<TypeKey, TypeData>* startCheck = 0;
+		while (n1 != 0 && n1->storage.first != key)
+			n1->storage.first < key ? n1 = n1->right : n1 = n1->left;
+		if (n1 == 0) //такого ключа нет, то false
 			return false;
-		if (n1->storage.first == key) {//если все таки нашли ключ
-			Node<TypeKey, TypeData>* nr;//новый "локальный корень" который будет вместе удаленной ноды
-			if (n1->right != 0) {//если есть справа что то
-				nr = n1->right; //запоминаем правую ноду от удаленной, он новый "локальный корень"
+		if (n1->storage.first == key) {// нашли ключ
+			Node<TypeKey, TypeData>* nr;//новый "локальный" корень, который будет вместо удаленной ноды
+			if (n1->right != 0) {//если есть справа
+				nr = n1->right; //запоминаем правую ноду от удаленной, он новый "локальный" корень
 				Node<TypeKey, TypeData>* n2 = nr;//пойдем влево до конца, туда запишем левую ноду удаленной ноды
 				while (n2->left != 0)
 					n2 = n2->left;
@@ -338,7 +359,7 @@ public:
 			else if (n1->parent == 0) {
 				nr->parent = 0;
 				root = nr;
-				//calculateHeight(root);//изменился корень, надо поменять только у него
+				rebalance(root);
 			}
 			else {
 				nr->parent = n1->parent;
@@ -348,15 +369,14 @@ public:
 				else {
 					n1->parent->right = nr;
 				}
-				if (startCheck == 0) calculateHeight(nr->parent);//если начальное значение, то значит глубоко мы не меняли, начинаем с отца удаленной ноды
-				else calculateHeight(startCheck);//иначе начиаем с глубокого места изменения
+				if (startCheck == 0) rebalance(nr->parent);
+				else rebalance(startCheck);
 			}
 			return true;
 		}
 	}
 //--------------------------------------------------------------------------------//
 };
-
 
 
 /*Node<TypeKey, TypeData>* n1 = n;

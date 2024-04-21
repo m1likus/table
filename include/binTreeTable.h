@@ -347,9 +347,9 @@ public:
 			if (n1->right != 0) { //если у n1 правый потомок !=0
 				nr = n1->right; //переходим в этого правого потомка
 				Node<TypeKey, TypeData>* n2 = nr; //и создаем еще узел
-				while (n2->left != 0) //
+				while (n2->left != 0)
 					n2 = n2->left; //переходим в него
-				n2->left = n1->left; //
+				n2->left = n1->left;
 				if(n1->left!=0)
 					n1->left->parent = n2;
 			}
