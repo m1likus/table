@@ -8,7 +8,7 @@ private:
 		int rh = 0, lh = 0;
 		n->right != 0 ? rh = n->right->height : rh = 0 ;
 		n->left != 0 ? lh = n->left->height : lh = 0;
-		return lh + rh;
+		return my_max(lh, rh) + 1;
 	}
 	void smallRight(Node<TypeKey, TypeData>* a) {
 		Node<TypeKey, TypeData>* b = a->left;
@@ -87,6 +87,10 @@ private:
 			b = a;
 			a = a ->parent;
 		}
+	}
+
+	int my_max(int a, int b) {
+		return a >= b ? a : b;
 	}
 
 public:
@@ -334,41 +338,49 @@ public:
 	}
 //--------------------------------------------------------------------------------//
 	bool remove(const TypeKey& key) {
-		Node<TypeKey, TypeData>* n1 = root;
+		Node<TypeKey, TypeData>* n1 = root; //начинаем с корня
 		Node<TypeKey, TypeData>* startCheck = 0;
 		while (n1 != 0 && n1->storage.first != key)
 			n1->storage.first < key ? n1 = n1->right : n1 = n1->left;
 		if (n1 == 0) //такого ключа нет, то false
 			return false;
 		if (n1->storage.first == key) {// нашли ключ
-			Node<TypeKey, TypeData>* nr;//новый "локальный" корень, который будет вместо удаленной ноды
+			Node<TypeKey, TypeData>* nr = 0;//новый "локальный" корень, который будет вместо удаленной ноды
 			if (n1->right != 0) {//если есть справа
 				nr = n1->right; //запоминаем правую ноду от удаленной, он новый "локальный" корень
 				Node<TypeKey, TypeData>* n2 = nr;//пойдем влево до конца, туда запишем левую ноду удаленной ноды
 				while (n2->left != 0)
 					n2 = n2->left;
 				n2->left = n1->left;//здесь записываем
-				n1->left->parent = n2;
+				if (n1->left != 0)
+					n1->left->parent = n2;
 				startCheck = n2;//как раз здесь мы запоминаем, где начать, чтобы не искать потом
 			}
-			else //если справа нет, то просто левую оставляем
+			else if (n1->left != 0)//если справа нет и слева есть, то просто левую оставляем
 				nr = n1->left;
-			if (nr == 0) {
-				root = nr;
+
+			
+			if (nr == 0 && n1->parent != 0) {//nr=0 когда у нас у удаленной вершины не было сыновей и ещё просматриваем есть ли у неё отец
+				if (n1->parent->left != 0 && n1->parent->left->storage.first == key)
+					n1->parent->left = nr;
+				else
+					n1->parent->right = nr;
+				return true;
 			}
-			else if (n1->parent == 0) {
+			else if (nr == 0 && n1->parent == 0) {//сыновей не было,  не было отца, значит корень
+				root = 0;
+			}
+			else if (n1->parent == 0) {//какие то сыновья были, но удаленная вершина была корнем
 				nr->parent = 0;
 				root = nr;
 				rebalance(root);
 			}
-			else {
+			else {//были сыновья, и был отец, дначит "стандартная" ситуация
 				nr->parent = n1->parent;
-				if (n1->parent->left->storage.first == key) {
+				if (n1->parent->left != 0 && n1->parent->left->storage.first == key)
 					n1->parent->left = nr;
-				}
-				else {
+				else
 					n1->parent->right = nr;
-				}
 				if (startCheck == 0) rebalance(nr->parent);
 				else rebalance(startCheck);
 			}
@@ -376,6 +388,9 @@ public:
 		}
 	}
 //--------------------------------------------------------------------------------//
+	int getHeight() { //высота для всего дерева
+		return root->height;
+	}
 };
 
 
@@ -445,6 +460,3 @@ return max_h;
 //	return lh > rh ? lh = lh + 1 : rh = rh + 1;
 //}
 
-//int my_max(int a, int b) {
-//	return a >= b ? a : b;
-//}

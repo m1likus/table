@@ -130,6 +130,51 @@ TEST(AvlTreeTable, test_insert1)
         EXPECT_EQ(a[i], 21);
     }
 }
-
-
+/*TEST(AvlTreeTable, test_insert_and_remove_while) {
+    int avlTreeN = 1000;
+    int N = 2000;
+    vector<int> vec_insert(N);
+    vector<int> vec_remove;
+    for (int i = 0; i < N; i++) {
+        vec_insert[i] = i;
+    }
+    random_device rd;
+    mt19937 g(rd());
+    std::shuffle(vec_insert.begin(), vec_insert.end(), g);
+    AvlTreeTable<int, int> a;
+    for (int i = 0; i < avlTreeN; i++) {
+        a.insert(vec_insert[i], vec_insert[i]);
+        vec_remove.push_back(vec_insert[i]);
+        swap(vec_insert[i], vec_insert[vec_insert.size() - 1]);
+        vec_insert.pop_back();
+    }
+    int startTreeHeight = a.getHeight(), treeHeight = startTreeHeight;
+    int count = 0;
+    while ((treeHeight - startTreeHeight) < 10) {
+        count++;
+        std::shuffle(vec_insert.begin(), vec_insert.end(), g);
+        std::shuffle(vec_remove.begin(), vec_remove.end(), g);
+        for (int i = 0; i < 100; i++) {
+            a.insert(vec_insert[i], vec_insert[i]);
+            vec_remove.push_back(vec_insert[i]);
+            swap(vec_insert[i], vec_insert[vec_insert.size() - 1]);
+            vec_insert.pop_back();
+        }
+        for (int i = 0; i < 100; i++) {
+            a.remove(vec_remove[i]);
+            vec_insert.push_back(vec_remove[i]);
+            swap(vec_remove[i], vec_remove[vec_remove.size() - 1]);
+            vec_remove.pop_back();
+        }
+        treeHeight = a.getHeight();
+    }
+    cout << "Total cycles of inserting and removing: " << count << endl;
+    ASSERT_EQ(a.size(), avlTreeN);
+}*/
+TEST(AvlTreeTable, test_height) {
+    AvlTreeTable<int, int> a;
+    a.insert(0, 0);
+    a.insert(1, 1);
+    ASSERT_EQ(a.getHeight(), 1);
+}
 

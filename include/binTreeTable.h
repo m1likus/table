@@ -356,17 +356,16 @@ public:
 			else if(n1->left != 0)
 				nr = n1->left;
 			
-			if (nr==0)
-				if (n1->parent != 0) {
-					if (n1->parent->left != 0 && n1->parent->left->storage.first == key)
-						n1->parent->left = nr;
-					else
-						n1->parent->right = nr;
-					return true;
-				}
-				else {
-					root = 0;
-				}
+			if (nr == 0 && n1->parent != 0) {
+				if (n1->parent->left != 0 && n1->parent->left->storage.first == key)
+					n1->parent->left = nr;
+				else
+					n1->parent->right = nr;
+				return true;
+			}
+			else if (nr == 0 && n1->parent == 0) {
+				root = 0;
+			}
 			else if (n1->parent == 0) {
 				nr->parent = 0;
 				root = nr;
