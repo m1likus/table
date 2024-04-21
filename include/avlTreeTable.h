@@ -3,39 +3,60 @@
 
 template <typename TypeKey, typename TypeData>
 class AvlTreeTable : public BinTreeTable<TypeKey, TypeData> {
-
 private:
-	int calculateHeight(Node<TypeKey,TypeData>*n) {
-		if (n == 0) return -1;
+	Node<TypeKey, TypeData>* smallRight(Node<TypeKey, TypeData>* n) {}
+	Node<TypeKey, TypeData>* smallLeft(Node<TypeKey, TypeData>* n) {}
+	Node<TypeKey, TypeData>* bigRight(Node<TypeKey, TypeData>* n) {}
+	Node<TypeKey, TypeData>* bigLeft(Node<TypeKey, TypeData>* n) {}
 
-		int lh = calculateHeight(n->left);
-		int rh = calculateHeight(n->right);
-		return lh > rh ? lh = lh + 1 : rh = rh + 1;
-	}
-	Node<TypeKey, TypeData>* check(Node<TypeKey, TypeData>* n) {
-		Node<TypeKey, TypeData>* n1 = n;
-		int hr = 0, hl = 0;
-		if (n1->right != 0) hr = n1->right->height;
-		if (n1->left != 0) hl = n1->left->height;
-		int delta = hl - hr;
-		if (delta < -1) {
-			return n1;
-		}
-		if (delta > -1) {
-			return n1;
-		}
-		//мы передаем ноду, которую добавили или отца удаленной ноды или ноду, у которой точно поменяется высота
-		//тут происходит пересчет высот от нашей ноды
-		//при пересчете принимаем решение на повороты
+
+	int difference(Node<TypeKey, TypeData>* n) {
+		int rh = 0, lh = 0;
+		n->right != 0 ? rh = n->right->height;
+		n->left != 0 ? lh = n->left->height;
+		return lh - rh;
 	}
 
-	int my_max(int a, int b) {
-		if (a >= b) return a;
-		else return b;
+	void rebalance(Node<TypeKey, TypeData>* n) {
+		Node<TypeKey, TypeData>* c = n;
+		Node<TypeKey, TypeData>* b = c->parent;
+		//b->parent != 0 ? Node<TypeKey, TypeData>* a = b->parent; //для большого поворота
+
+		do {
+			int diff_c = difference(c);
+			int diff_b = difference(b);
+
+			if ((diff_b == -1 || diff_b == 0) && diff_a == -2) {
+				smallLeft();
+				return;
+			}
+			else if ((diff_b == 1 || diff_b == 0) && diff_a == 2) {
+				smallRight();
+				return;
+			}
+			c = b;
+			b = b->parent;
+		} while (b!=0);
+
+		do {
+			c = n;
+			b = c->parent;
+			b->parent != 0 ? Node<TypeKey, TypeData>* a = b->parent : return;
+
+
+		} while (a!=0);
+
+
+
+		//if (diff_b < -1) {
+		//	return b;
+		//}
+		//if (diff_b  > -1) {
+		//	return b;
+		//}
 	}
 
 public:
-
 	AvlTreeTable() { //конструктор по умолчанию
 		root = 0;
 	}
@@ -245,7 +266,7 @@ public:
 		return *this;
 	}
 //--------------------------------------------------------------------------------//
-	binTreeIterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& d) {//здесь вроде все стандартно, не вижу смысла комментить)
+	binTreeIterator<TypeKey, TypeData> insert(const TypeKey& key, const TypeData& d) {
 		if (root == 0) {
 			root = new Node<TypeKey, TypeData>();
 			root->parent = 0;
@@ -260,28 +281,30 @@ public:
 			Node<TypeKey, TypeData>* n2 = 0;
 			while (n1 != 0 && n1->storage.first != key) {
 				n2 = n1;
-				if (n1->storage.first < key)
+				n1->storage.first < key ? n1 = n1->right : n1 = n1->left;
+				/*if (n1->storage.first < key)
 					n1 = n1->right;
 				else
-					n1 = n1->left;
+					n1 = n1->left;*/
 			}
-			if (n1 == 0) {
+			if (n1->storage.first == key) {
+				n1->storage.second = d;
+			}
+			else if (n1 == 0) {
 				n1 = new Node<TypeKey, TypeData>();
 				n1->storage = make_pair(key, d);
 				n1->left = 0;
 				n1->right = 0;
 				n1->parent = n2;
+				n1->height = 0;
 				if (n2->storage.first < n1->storage.first)
 					n2->right = n1;
 				else
 					n2->left = n1;
-				calculateHeight();
+				rebalance(n2); // начинаем с отца, тк с n1 - бесполезно
 			}
-			else if (n1->storage.first == key) {
-				n1->storage.second = d;
-			}
+			
 			return binTreeIterator<TypeKey, TypeData>(*n1,*this);
-			//return binTreeIterator<TypeKey, TypeData>(n1->storage);
 		}
 	}
 //--------------------------------------------------------------------------------//
@@ -315,7 +338,7 @@ public:
 			else if (n1->parent == 0) {
 				nr->parent = 0;
 				root = nr;
-				calculateHeight(root);//изменился корень, надо поменять только у него
+				//calculateHeight(root);//изменился корень, надо поменять только у него
 			}
 			else {
 				nr->parent = n1->parent;
@@ -333,6 +356,9 @@ public:
 	}
 //--------------------------------------------------------------------------------//
 };
+
+
+
 /*Node<TypeKey, TypeData>* n1 = n;
 while (n1->parent != 0) {
 	int hr = 0, hl = 0;
@@ -345,47 +371,60 @@ while (n1->parent != 0) {
 
 
 //рабочий вариант, но работает скорее всего долго
-		/*Node<TypeKey, TypeData>* n1 = n;
-		int h = 0;
-		int max_h = 0;
-		while (n1->left != 0) {
-			n1 = n1->left;
+/*Node<TypeKey, TypeData>* n1 = n;
+int h = 0;
+int max_h = 0;
+while (n1->left != 0) {
+	n1 = n1->left;
+	h++;
+}
+if (h > max_h) max_h = h;
+while (true) {
+	Node<TypeKey, TypeData>* it_node = n1;
+	if (it_node->right != 0) {
+		it_node = it_node->right;
+		h++;
+		while (it_node->left != 0) {
+			it_node = it_node->left;
 			h++;
 		}
-		if (h > max_h) max_h = h;
-		while (true) {
-			Node<TypeKey, TypeData>* it_node = n1;
-			if (it_node->right != 0) {
-				it_node = it_node->right;
-				h++;
-				while (it_node->left != 0) {
-					it_node = it_node->left;
-					h++;
-				}
-			}
-			else {
-				Node<TypeKey, TypeData>* save_node(it_node);
-				while (it_node->parent != 0 && it_node->parent->right == it_node) {
-					it_node = it_node->parent;
-					h--;
-				}
-				if (it_node->parent == 0) {
-					it_node = save_node;
-					break;
-				}
-				else if (it_node->parent->left == it_node) {
-					it_node = it_node->parent;
-					h--;
-				}
-			}
-			n1 = it_node;
-			if (h > max_h) max_h = h;
+	}
+	else {
+		Node<TypeKey, TypeData>* save_node(it_node);
+		while (it_node->parent != 0 && it_node->parent->right == it_node) {
+			it_node = it_node->parent;
+			h--;
 		}
-		return max_h;*/
+		if (it_node->parent == 0) {
+			it_node = save_node;
+			break;
+		}
+		else if (it_node->parent->left == it_node) {
+			it_node = it_node->parent;
+			h--;
+		}
+	}
+	n1 = it_node;
+	if (h > max_h) max_h = h;
+}
+return max_h;
+*/
 
-	//void getHeightTree() {
-	//	auto i = this->begin();
-	//	for (i; i != a.end(); ++i) {
-	//		i->it_node->height = calculateHeight(i->it_node);
-	//	}
-	//}
+//void getHeightTree() {
+//	auto i = this->begin();
+//	for (i; i != a.end(); ++i) {
+//		i->it_node->height = calculateHeight(i->it_node);
+//	}
+//}
+
+//int calculateHeight(Node<TypeKey,TypeData>*n) {
+//	if (n == 0) return -1;
+
+//	int lh = calculateHeight(n->left);
+//	int rh = calculateHeight(n->right);
+//	return lh > rh ? lh = lh + 1 : rh = rh + 1;
+//}
+
+//int my_max(int a, int b) {
+//	return a >= b ? a : b;
+//}
