@@ -370,6 +370,7 @@ public:
 				else
 					n1->parent->right = nr;
 			}
+			delete n1;
 			return true;
 		}
 	}

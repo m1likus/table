@@ -4,26 +4,57 @@
 template <typename TypeKey, typename TypeData>
 class AvlTreeTable : public BinTreeTable<TypeKey, TypeData> {
 private:
-	int recorrect(Node<TypeKey, TypeData>* n) {
-		int rh = 0, lh = 0;
-		n->right != 0 ? rh = n->right->height : rh = 0 ;
-		n->left != 0 ? lh = n->left->height : lh = 0;
-		return my_max(lh, rh) + 1;
+	void recorrect(Node<TypeKey, TypeData>* n) {
+		int rh = -1, lh = -1;
+		n->right != 0 ? rh = n->right->height : rh = -1 ;
+		n->left != 0 ? lh = n->left->height : lh = -1;
+		n->height = my_max(lh, rh) + 1;
 	}
 	void smallRight(Node<TypeKey, TypeData>* a) {
+		bool change_root = false;
 		Node<TypeKey, TypeData>* b = a->left;
+		if (a->parent != 0) a->parent->right = b;
+		else change_root = true;
+		b->parent = a->parent;
+
+		if (b->right != 0) b->right->parent = a;
 		a->left = b->right;
+
 		b->right = a;
-		recorrect(a);
+		a->parent = b;
+
+		a = b;
+		b = a->right;
+
+		if (change_root) root = a;
+
 		recorrect(b);
+		recorrect(a);
 
 	}
 	void smallLeft(Node<TypeKey, TypeData>* a) {
+		bool change_root = false;
 		Node<TypeKey, TypeData>* b = a->right;
+		if (a->parent != 0) {
+			if(a->parent->right==a) a->parent->right = b;
+			else a->parent->left = b;
+		}
+		else change_root = true;
+		b->parent = a->parent;
+
+		if (b->left != 0) b->left->parent = a;
 		a->right = b->left;
+
 		b->left = a;
-		recorrect(a);
+		a->parent = b;
+
+		a = b;
+		b = a->left;
+
+		if (change_root) root = a;
+
 		recorrect(b);
+		recorrect(a);
 	}
 	void bigRight(Node<TypeKey, TypeData>* a) {
 		smallLeft(a->left);
@@ -35,9 +66,9 @@ private:
 	}
 
 	int difference(Node<TypeKey, TypeData>* n) {
-		int rh = 0, lh = 0;
-		n->right != 0 ? rh = n->right->height : rh = 0 ;
-		n->left != 0 ? lh = n->left->height : lh = 0;
+		int rh = -1, lh = -1;
+		n->right != 0 ? rh = n->right->height : rh = -1 ;
+		n->left != 0 ? lh = n->left->height : lh = -1;
 		return lh - rh;
 	}
 	void rebalance(Node<TypeKey, TypeData>* n) {
@@ -87,6 +118,51 @@ private:
 			b = a;
 			a = a ->parent;
 		}
+	}
+	
+	void my_rebalance(Node<TypeKey, TypeData>* n, bool type) {
+		Node<TypeKey, TypeData>* c = n;
+		Node<TypeKey, TypeData>* b = 0;
+		Node<TypeKey, TypeData>* a = 0;
+		int diff_c = 0;
+		int diff_b = 0;
+		int diff_a = 0;
+
+		recorrect(c);
+		while (c->parent != 0) {
+			b = c->parent;
+			recorrect(b);
+			if (b->parent != 0) {
+				a = b->parent;
+				recorrect(a);
+			}
+			else a = 0;
+			//обновили все данные, сейчас будем делать повороты
+			
+			diff_c = difference(c);
+			diff_b = difference(b);
+			if(a!=0) diff_a = difference(a);
+
+			if (diff_c <= 0 && diff_b == -2) {
+				smallLeft(b);
+				if (type) break;
+			}
+			else if (diff_c <= 0 && diff_b == 2) {
+				smallRight(b);
+				if (type) break;
+			}
+			else if (diff_c <= 1 && diff_b == 1 && diff_a == -2) {
+				bigLeft(a);
+				if (type) break;
+			}
+			else if (diff_c <= 1 && diff_b == -1 && diff_a == 2) {
+				bigRight(a);
+				if (type) break;
+			}
+			//
+			c = b;
+		}
+		
 	}
 
 	int my_max(int a, int b) {
@@ -331,7 +407,10 @@ public:
 					n2->right = n1;
 				else
 					n2->left = n1;
-				rebalance(n1);
+				my_rebalance(n1, 1);
+			}
+			else if (n1->storage.first == key) {
+				n1->storage.second = d;
 			}
 			return binTreeIterator<TypeKey, TypeData>(*n1,*this);
 		}
@@ -366,7 +445,7 @@ public:
 			else if (n1->parent == 0) {//какие то сыновья были, но удаленная вершина была корнем
 				nr->parent = 0;
 				root = nr;
-				rebalance(root);
+				my_rebalance(root, 0);
 			}
 			else {//был отец
 				if(nr!=0) nr->parent = n1->parent;//если вершина пустая, то просто к ней не обращаемся и дальше как обычно
@@ -374,9 +453,10 @@ public:
 					n1->parent->left = nr;
 				else
 					n1->parent->right = nr;
-				if (startCheck == 0) rebalance(nr->parent);
-				else rebalance(startCheck);
+				if (startCheck == 0) my_rebalance(n1->parent, 0);
+				else my_rebalance(startCheck,0);
 			}
+			delete n1;
 			return true;
 		}
 	}

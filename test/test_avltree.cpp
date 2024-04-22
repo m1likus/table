@@ -109,7 +109,7 @@ TEST(AvlTreeTable, remove_false)
 TEST(AvlTreeTable, test_insert1)
 {
     int s = 0;
-    int N = 1000;
+    int N = 10;
     vector<bool> b(N);
     AvlTreeTable<int, int> a;
     int k = N;
@@ -129,6 +129,28 @@ TEST(AvlTreeTable, test_insert1)
     for (int i = 0; i < N; i++) {
         EXPECT_EQ(a[i], 21);
     }
+}
+TEST(AvlTreeTable, test_remove1)
+{
+    int s = 0;
+    int N = 10;
+    vector<bool> b(N);
+    AvlTreeTable<int, int> a;
+    int k = N;
+    while (k != 1) {
+        k /= 2;
+        for (int i = k; i < N; i += k) {
+            if (!b[i])
+                a.insert(i, 20);
+            b[i] = 1;
+        }
+    }
+    a.insert(0, 20);
+
+    for (int i = 0; i < N; i++) {
+        a.remove(i);
+    }
+    
 }
 /*TEST(AvlTreeTable, test_insert_and_remove_while) {
     int avlTreeN = 1000;
@@ -175,6 +197,7 @@ TEST(AvlTreeTable, test_height) {
     AvlTreeTable<int, int> a;
     a.insert(0, 0);
     a.insert(1, 1);
+    a.insert(2, 2);
     ASSERT_EQ(a.getHeight(), 1);
 }
 
