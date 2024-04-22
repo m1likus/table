@@ -360,14 +360,7 @@ public:
 				nr = n1->left;
 
 			
-			if (nr == 0 && n1->parent != 0) {//nr=0 когда у нас у удаленной вершины не было сыновей и ещё просматриваем есть ли у неё отец
-				if (n1->parent->left != 0 && n1->parent->left->storage.first == key)
-					n1->parent->left = nr;
-				else
-					n1->parent->right = nr;
-				return true;
-			}
-			else if (nr == 0 && n1->parent == 0) {//сыновей не было,  не было отца, значит корень
+			if (nr == 0 && n1->parent == 0) {//сыновей не было,  не было отца, значит корень
 				root = 0;
 			}
 			else if (n1->parent == 0) {//какие то сыновья были, но удаленная вершина была корнем
@@ -375,8 +368,8 @@ public:
 				root = nr;
 				rebalance(root);
 			}
-			else {//были сыновья, и был отец, дначит "стандартная" ситуация
-				nr->parent = n1->parent;
+			else {//был отец
+				if(nr!=0) nr->parent = n1->parent;//если вершина пустая, то просто к ней не обращаемся и дальше как обычно
 				if (n1->parent->left != 0 && n1->parent->left->storage.first == key)
 					n1->parent->left = nr;
 				else
