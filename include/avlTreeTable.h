@@ -11,28 +11,30 @@ private:
 		n->height = my_max(lh, rh) + 1;
 	}
 	void smallRight(Node<TypeKey, TypeData>* a) {
-		bool change_root = false;
+		bool change_root = false;//флаг если корень меняем
 		Node<TypeKey, TypeData>* b = a->left;
-		if (a->parent != 0) a->parent->right = b;
-		else change_root = true;
-		b->parent = a->parent;
+		if (a->parent != 0) 
+			if (a->parent->right == a) a->parent->right = b;//меняем у отца a какого то сына на b
+			else a->parent->left = b;
+		else change_root = true; //если отца нет, то мы в корне
+		b->parent = a->parent;//меняем отца b
 
-		if (b->right != 0) b->right->parent = a;
-		a->left = b->right;
+		if (b->right != 0) b->right->parent = a;//если справа был сын, то меняем ему отца с b на a
+		a->left = b->right;//меняем сына
 
-		b->right = a;
-		a->parent = b;
+		b->right = a;//меняем сына
+		a->parent = b;//меняем отца
 
-		a = b;
+		a = b;//поменяем их местами, а то я запутался
 		b = a->right;
 
 		if (change_root) root = a;
 
 		recorrect(b);
 		recorrect(a);
-
+		
 	}
-	void smallLeft(Node<TypeKey, TypeData>* a) {
+	void smallLeft(Node<TypeKey, TypeData>* a) {//здесь так же, как и в левом повороте
 		bool change_root = false;
 		Node<TypeKey, TypeData>* b = a->right;
 		if (a->parent != 0) {
@@ -71,56 +73,8 @@ private:
 		n->left != 0 ? lh = n->left->height : lh = -1;
 		return lh - rh;
 	}
-	void rebalance(Node<TypeKey, TypeData>* n) {
-		//всего учитывается 3 верш., чтобы можно было сделать как малый, так и большой поворот
-		Node<TypeKey, TypeData>* c = n; 
-		Node<TypeKey, TypeData>* b = c->parent;
-		//первый цикл с малыми поворотами, используется 2 верш
-		while(c!=0 && b!=0){
-			int diff_c = difference(c);
-			int diff_b = difference(b);
-
-			if ((diff_c == -1 || diff_c == 0) && diff_b == -2) {
-				smallLeft(b);
-				return;
-			}
-			else if ((diff_c == 1 || diff_c == 0) && diff_b == 2) {
-				smallRight(b);
-				return;
-			}
-			//делаем переход на 1 этаж вверх
-			c = b;
-			b = b->parent;
-		}  
-		//обнуляем ситуацию
-		c = n;
-		b = c->parent;
-		//вводим 3тью верш. 
-		// a==0 - ребалансировка уже не нужна, тк мы в корне и малые не пригодились
-		Node<TypeKey, TypeData>* a = b->parent;;
-		if (a == 0) return;
-		//проходим еще раз с переданной верш.
-		while(c!=0 && b!=0 && a!=0){
-			int diff_c = difference(c);
-			int diff_b = difference(b);
-			int diff_a = difference(a);
-
-			if (diff_c <= 1 && diff_b == 1 && diff_a == -2) {
-				bigLeft(a);
-				return;
-			}
-			else if (diff_c <= 1 && diff_b == -1 && diff_a == 2) {
-				bigRight(a);
-				return;
-			}
-			//делаем переход на 1 этаж вверх
-			c = b;
-			b = a;
-			a = a ->parent;
-		}
-	}
 	
-	void my_rebalance(Node<TypeKey, TypeData>* n, bool type) {
+	void rebalance(Node<TypeKey, TypeData>* n, bool type) {//пум пум пум...
 		Node<TypeKey, TypeData>* c = n;
 		Node<TypeKey, TypeData>* b = 0;
 		Node<TypeKey, TypeData>* a = 0;
@@ -128,23 +82,40 @@ private:
 		int diff_b = 0;
 		int diff_a = 0;
 
-		recorrect(c);
-		while (c->parent != 0) {
+		recorrect(c);//обновляем высоту рассматриваемой вершны
+		while (c->parent != 0) { //будем делать, пока не дойдем до корня
 			b = c->parent;
-			recorrect(b);
-			if (b->parent != 0) {
+			recorrect(b);//обновляем высоту отца
+			if (b->parent != 0) {//если есть отец отца, то его тоде беру
 				a = b->parent;
 				recorrect(a);
 			}
 			else a = 0;
 			//обновили все данные, сейчас будем делать повороты
 			
-			diff_c = difference(c);
+			diff_c = difference(c);//обновляем разности
 			diff_b = difference(b);
+			diff_a = 0;
 			if(a!=0) diff_a = difference(a);
 
-			if (diff_c <= 0 && diff_b == -2) {
-				smallLeft(b);
+			if (diff_c <= 0 && diff_b == -2) {//и по поворотам
+				smallLeft(b);//при поворотах мы меняем и вот эта b смещается, но почему то ошибок нет, возможно мы одно делаем много лишних действий
+							//по идее здесь надо добавить c=b; b=b->parent, но не точно
+				//
+				// 	 b
+				// /   \
+				// P    c
+				//	   / \
+				//    Q   R
+				//
+				//		c
+				//     / \
+				//    b   R 
+				//   / \
+				//  P   Q
+				// 
+				// и это все аналогично про все следующие переходы
+				//
 				if (type) break;
 			}
 			else if (diff_c <= 0 && diff_b == 2) {
@@ -160,9 +131,11 @@ private:
 				if (type) break;
 			}
 			//
-			c = b;
+			c = b;//обновляем рассматриваемую вершину
 		}
-		
+		//вот здесь после цикла можно нашаманить проверку для другой ветки при remove
+		//эту проблему видно на этом тесте test_insert_and_remove_while
+		//самый смех, что он изза этого иногда падает, иногда нет  O_O
 	}
 
 	int my_max(int a, int b) {
@@ -407,7 +380,7 @@ public:
 					n2->right = n1;
 				else
 					n2->left = n1;
-				my_rebalance(n1, 1);
+				rebalance(n1, 1);
 			}
 			else if (n1->storage.first == key) {
 				n1->storage.second = d;
@@ -445,7 +418,7 @@ public:
 			else if (n1->parent == 0) {//какие то сыновья были, но удаленная вершина была корнем
 				nr->parent = 0;
 				root = nr;
-				my_rebalance(root, 0);
+				rebalance(root, 0);
 			}
 			else {//был отец
 				if(nr!=0) nr->parent = n1->parent;//если вершина пустая, то просто к ней не обращаемся и дальше как обычно
@@ -453,8 +426,11 @@ public:
 					n1->parent->left = nr;
 				else
 					n1->parent->right = nr;
-				if (startCheck == 0) my_rebalance(n1->parent, 0);
-				else my_rebalance(startCheck,0);
+				if (startCheck == 0) {
+					if (nr == 0) rebalance(n1->parent, 0);
+					else rebalance(nr, 0);
+				}
+				else rebalance(startCheck,0);
 			}
 			delete n1;
 			return true;

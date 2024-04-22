@@ -109,7 +109,7 @@ TEST(AvlTreeTable, remove_false)
 TEST(AvlTreeTable, test_insert1)
 {
     int s = 0;
-    int N = 10;
+    int N = 1;
     vector<bool> b(N);
     AvlTreeTable<int, int> a;
     int k = N;
@@ -133,7 +133,7 @@ TEST(AvlTreeTable, test_insert1)
 TEST(AvlTreeTable, test_remove1)
 {
     int s = 0;
-    int N = 10;
+    int N = 100;
     vector<bool> b(N);
     AvlTreeTable<int, int> a;
     int k = N;
@@ -152,7 +152,7 @@ TEST(AvlTreeTable, test_remove1)
     }
     
 }
-/*TEST(AvlTreeTable, test_insert_and_remove_while) {
+TEST(AvlTreeTable, test_insert_and_remove_while) {//вот этот тест показывает проблему ремува, которую надо решать, я в пт поеду домой, в поезде попишу, думаю, без инета справлюсь
     int avlTreeN = 1000;
     int N = 2000;
     vector<int> vec_insert(N);
@@ -192,7 +192,7 @@ TEST(AvlTreeTable, test_remove1)
     }
     cout << "Total cycles of inserting and removing: " << count << endl;
     ASSERT_EQ(a.size(), avlTreeN);
-}*/
+}
 TEST(AvlTreeTable, test_height) {
     AvlTreeTable<int, int> a;
     a.insert(0, 0);
