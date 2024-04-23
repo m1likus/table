@@ -109,7 +109,7 @@ TEST(AvlTreeTable, remove_false)
 TEST(AvlTreeTable, test_insert1)
 {
     int s = 0;
-    int N = 1;
+    int N = 1000;
     vector<bool> b(N);
     AvlTreeTable<int, int> a;
     int k = N;
@@ -133,7 +133,7 @@ TEST(AvlTreeTable, test_insert1)
 TEST(AvlTreeTable, test_remove1)
 {
     int s = 0;
-    int N = 100;
+    int N = 1000;
     vector<bool> b(N);
     AvlTreeTable<int, int> a;
     int k = N;
@@ -148,6 +148,8 @@ TEST(AvlTreeTable, test_remove1)
     a.insert(0, 20);
 
     for (int i = 0; i < N; i++) {
+        if (i == 93)
+            i = 93;
         a.remove(i);
     }
     
@@ -173,6 +175,7 @@ TEST(AvlTreeTable, test_insert_and_remove_while) {//вот этот тест показывает про
     int startTreeHeight = a.getHeight(), treeHeight = startTreeHeight;
     int count = 0;
     while ((treeHeight - startTreeHeight) < 10) {
+        cout << count << " ";
         count++;
         std::shuffle(vec_insert.begin(), vec_insert.end(), g);
         std::shuffle(vec_remove.begin(), vec_remove.end(), g);
