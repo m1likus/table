@@ -148,13 +148,14 @@ TEST(AvlTreeTable, test_remove1)
     a.insert(0, 20);
 
     for (int i = 0; i < N; i++) {
-        if (i == 93)
-            i = 93;
+        if (i == 94) {
+            i = 94;
+        }
         a.remove(i);
     }
-    
 }
-TEST(AvlTreeTable, test_insert_and_remove_while) {//вот этот тест показывает проблему ремува, которую надо решать, я в пт поеду домой, в поезде попишу, думаю, без инета справлюсь
+
+TEST(AvlTreeTable, test_insert_and_remove_while) {
     int avlTreeN = 1000;
     int N = 2000;
     vector<int> vec_insert(N);

@@ -6,6 +6,7 @@
 #include "sortTable.h"
 #include "hashTable.h"
 #include "binTreeTable.h"
+#include "avlTreeTable.h"
 #include <string>
 using namespace std;
 
@@ -13,17 +14,12 @@ using namespace std;
 
 
 int main() {
-    int N = 1000;
-    vector<int> b(N);
-    for (int i = 0; i < N; i++) {
-        b[i] = i;
-    }
-    random_device rd;
-    mt19937 g(rd());
-    std::shuffle(b.begin(), b.end(), g);
-    BinTreeTable<int, int> a;
-    for (int i = 0; i < N; i++) {
-        a.insert(b[i], b[i]);
-    }
-    cout << a.getHeight();
+	AvlTreeTable <int, int> a;
+	a.insert(100, 0);
+	a.insert(50, 0);
+	a.insert(160, 0);
+	a.insert(130, 0);
+	a.insert(170, 0);
+
+	a.remove(50);
 }

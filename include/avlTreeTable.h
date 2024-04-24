@@ -74,34 +74,34 @@ private:
 		return lh - rh;
 	}
 	
-	void rebalance(Node<TypeKey, TypeData>* n, bool type) {//пум пум пум...
-		Node<TypeKey, TypeData>* c = n;
+	void rebalance(Node<TypeKey, TypeData>* n, bool type) {
+ 		Node<TypeKey, TypeData>* c = n;
 		Node<TypeKey, TypeData>* b = 0;
 		Node<TypeKey, TypeData>* a = 0;
 		int diff_c = 0;
 		int diff_b = 0;
 		int diff_a = 0;
 
-		recorrect(c);//обновляем высоту рассматриваемой вершны
-		while (c->parent != 0) { //будем делать, пока не дойдем до корня
+		recorrect(c);//обновляем высоту рассматриваемой верш.
+		while (c->parent != 0) { //идем, пока не дойдем до корня
 			b = c->parent;
 			recorrect(b);//обновляем высоту отца
-			if (b->parent != 0) {//если есть отец отца, то его тоде беру
+			if (b->parent != 0) { // если у отца есть отец, берем его
 				a = b->parent;
 				recorrect(a);
 			}
 			else a = 0;
-			//обновили все данные, сейчас будем делать повороты
+
+			//делаем повороты
 			
-			diff_c = difference(c);//обновляем разности
+			diff_c = difference(c);
 			diff_b = difference(b);
 			diff_a = 0;
-			if(a!=0) diff_a = difference(a);
+			if (a != 0) diff_a = difference(a);
 
 			if (diff_c <= 0 && diff_b == -2) {//и по поворотам
 				smallLeft(b);//при поворотах мы меняем и вот эта b смещается, но почему то ошибок нет, возможно мы одно делаем много лишних действий
-							//по идее здесь надо добавить c=b; b=b->parent, но не точно
-				//
+							//c=b; b=b->parent ?
 				// 	 b
 				// /   \
 				// P    c
@@ -114,29 +114,22 @@ private:
 				//   / \
 				//  P   Q
 				// 
-				// и это все аналогично про все следующие переходы
-				//
-				if (type) break;
+				if (type) return;
 			}
 			else if (diff_c <= 0 && diff_b == 2) {
 				smallRight(b);
-				if (type) break;
+				if (type) return;
 			}
 			else if (diff_c <= 1 && diff_b == 1 && diff_a == -2) {
 				bigLeft(a);
-				if (type) break;
+				if (type) return;
 			}
 			else if (diff_c <= 1 && diff_b == -1 && diff_a == 2) {
 				bigRight(a);
-				if (type) break;
+				if (type) return;
 			}
-			//
-			c = b;//обновляем рассматриваемую вершину
+			c = b;
 		}
-		//вот здесь после цикла можно нашаманить проверку для другой ветки при remove
-		//эту проблему видно на этом тесте test_insert_and_remove_while
-		//самый смех, что он изза этого иногда падает, иногда нет  O_O
-
 	}
 
 	int my_max(int a, int b) {
@@ -413,10 +406,10 @@ public:
 				nr = n1->left;
 
 			
-			if (nr == 0 && n1->parent == 0) {//сыновей не было,  не было отца, значит корень
+			if (nr == 0 && n1->parent == 0) {//сыновей не было, не было отца, значит корень
 				root = 0;
 			}
-			else if (n1->parent == 0) {//какие то сыновья были, но удаленная вершина была корнем
+			else if (n1->parent == 0) {//какие-то сыновья были, но удаленная вершина была корнем
 				nr->parent = 0;
 				root = nr;
 				rebalance(root, 0);
@@ -442,71 +435,4 @@ public:
 		return root->height;
 	}
 };
-
-
-/*Node<TypeKey, TypeData>* n1 = n;
-while (n1->parent != 0) {
-	int hr = 0, hl = 0;
-	if (n1->right != 0) hr = n1->right->height;
-	if (n1->left != 0) hl = n1->left->height;
-	n1->height = my_max(hr, hl);
-	n1 = check(n1);
-	n1 = n1->parent;
-}*/
-
-
-//рабочий вариант, но работает скорее всего долго
-/*Node<TypeKey, TypeData>* n1 = n;
-int h = 0;
-int max_h = 0;
-while (n1->left != 0) {
-	n1 = n1->left;
-	h++;
-}
-if (h > max_h) max_h = h;
-while (true) {
-	Node<TypeKey, TypeData>* it_node = n1;
-	if (it_node->right != 0) {
-		it_node = it_node->right;
-		h++;
-		while (it_node->left != 0) {
-			it_node = it_node->left;
-			h++;
-		}
-	}
-	else {
-		Node<TypeKey, TypeData>* save_node(it_node);
-		while (it_node->parent != 0 && it_node->parent->right == it_node) {
-			it_node = it_node->parent;
-			h--;
-		}
-		if (it_node->parent == 0) {
-			it_node = save_node;
-			break;
-		}
-		else if (it_node->parent->left == it_node) {
-			it_node = it_node->parent;
-			h--;
-		}
-	}
-	n1 = it_node;
-	if (h > max_h) max_h = h;
-}
-return max_h;
-*/
-
-//void getHeightTree() {
-//	auto i = this->begin();
-//	for (i; i != a.end(); ++i) {
-//		i->it_node->height = calculateHeight(i->it_node);
-//	}
-//}
-
-//int calculateHeight(Node<TypeKey,TypeData>*n) {
-//	if (n == 0) return -1;
-
-//	int lh = calculateHeight(n->left);
-//	int rh = calculateHeight(n->right);
-//	return lh > rh ? lh = lh + 1 : rh = rh + 1;
-//}
 
