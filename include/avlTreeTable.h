@@ -23,7 +23,7 @@ private:
 		HasLeftChild(node)  ? lh = node->left->height : lh = -1;
 		node->height = my_max(lh, rh) + 1;
 	}
-	void smallRight(Node<TypeKey, TypeData>* a) {
+	Node<TypeKey, TypeData>* smallRight(Node<TypeKey, TypeData>* a) {
 		bool change_root = false;//флаг если корень меняем
 		Node<TypeKey, TypeData>* b = a->left;
 		if (HasParent(a)) 
@@ -38,16 +38,13 @@ private:
 		b->right = a;//меняем сына
 		a->parent = b;//меняем отца
 
-		a = b;//поменяем их местами, а то я запутался
-		b = a->right;
+		if (change_root) root = b;
 
-		if (change_root) root = a;
-
-		recorrect(b);
 		recorrect(a);
-		
+		recorrect(b);
+		return b;
 	}
-	void smallLeft(Node<TypeKey, TypeData>* a) {//здесь так же, как и в левом повороте
+	Node<TypeKey, TypeData>* smallLeft(Node<TypeKey, TypeData>* a) {//здесь так же, как и в левом повороте
 		bool change_root = false;
 		Node<TypeKey, TypeData>* b = a->right;
 		if (HasParent(a)) {
@@ -63,21 +60,21 @@ private:
 		b->left = a;
 		a->parent = b;
 
-		a = b;
-		b = a->left;
+		if (change_root) root = b;
 
-		if (change_root) root = a;
-
-		recorrect(b);
 		recorrect(a);
+		recorrect(b);
+		return b;
 	}
-	void bigRight(Node<TypeKey, TypeData>* a) {
+	Node<TypeKey, TypeData>* bigRight(Node<TypeKey, TypeData>* a) {
 		smallLeft(a->left);
-		smallRight(a);
+		a = smallRight(a);
+		return a;
 	}
-	void bigLeft(Node<TypeKey, TypeData>* a) {
+	Node<TypeKey, TypeData>* bigLeft(Node<TypeKey, TypeData>* a) {
 		smallRight(a->right);
-		smallLeft(a);
+		a = smallLeft(a);
+		return a;
 	}
 
 	int difference(Node<TypeKey, TypeData>* node) {
@@ -112,8 +109,8 @@ private:
 			diff_a = 0;
 			if (a != 0) diff_a = difference(a);
 
-			if (diff_c <= 0 && diff_b == -2) {//и по поворотам
-				smallLeft(b);//при поворотах мы меняем и вот эта b смещается, но почему то ошибок нет, возможно мы одно делаем много лишних действий
+			if (diff_c <= 0 && diff_b == -2 && c==b->right) {//и по поворотам
+				b = smallLeft(b);//при поворотах мы меняем и вот эта b смещается, но почему то ошибок нет, возможно мы одно делаем много лишних действий
 							//c=b; b=b->parent ?
 				// 	 b
 				// /   \
@@ -129,16 +126,16 @@ private:
 				// 
 				if (type) return;
 			}
-			else if (diff_c <= 0 && diff_b == 2) {
-				smallRight(b);
+			else if (diff_c >= 0 && diff_b == 2 && c == b->left) {
+				b = smallRight(b);
 				if (type) return;
 			}
-			else if (diff_c <= 1 && diff_b == 1 && diff_a == -2) {
-				bigLeft(a);
+			else if (diff_b == 1 && diff_a == -2 && c == b->left && b == a->right) {
+				b = bigLeft(a);
 				if (type) return;
 			}
-			else if (diff_c <= 1 && diff_b == -1 && diff_a == 2) {
-				bigRight(a);
+			else if (diff_b == -1 && diff_a == 2 && c == b->right && b == a->left) {
+				b = bigRight(a);
 				if (type) return;
 			}
 			c = b;
@@ -398,50 +395,78 @@ public:
 //--------------------------------------------------------------------------------//
 	bool remove(const TypeKey& key) {
 		Node<TypeKey, TypeData>* n1 = root; //начинаем с корня
-		Node<TypeKey, TypeData>* startCheck = 0;
 		while (n1 != 0 && n1->storage.first != key)
 			n1->storage.first < key ? n1 = n1->right : n1 = n1->left;
 		if (n1 == 0) //такого ключа нет, то false
 			return false;
-		if (n1->storage.first == key) {// нашли ключ
-			Node<TypeKey, TypeData>* nr = 0;//новый "локальный" корень, который будет вместо удаленной ноды
-			if (HasRightChild(n1)) {//если есть справа
-				nr = n1->right; //запоминаем правую ноду от удаленной, он новый "локальный" корень
-				Node<TypeKey, TypeData>* n2 = nr;//пойдем влево до конца, туда запишем левую ноду удаленной ноды
-				while (HasLeftChild(n2))
-					n2 = n2->left;
-				n2->left = n1->left;//здесь записываем
-				if (HasLeftChild(n1))
-					n1->left->parent = n2;
-				startCheck = n2;//как раз здесь мы запоминаем, где начать, чтобы не искать потом
-			}
-			else if (HasLeftChild(n1))//если справа нет и слева есть, то просто левую оставляем
-				nr = n1->left;
 
-			
-			if (nr == 0 && n1->parent == 0) {//сыновей не было, не было отца, значит корень
-				root = 0;
-			}
-			else if (n1->parent == 0) {//какие-то сыновья были, но удаленная вершина была корнем
-				nr->parent = 0;
-				root = nr;
-				rebalance(root, 0);
-			}
-			else {//был отец
-				if(nr!=0) nr->parent = n1->parent;//если вершина пустая, то просто к ней не обращаемся и дальше как обычно
-				if (n1->parent->left != 0 && n1->parent->left->storage.first == key)
-					n1->parent->left = nr;
-				else
-					n1->parent->right = nr;
-				if (startCheck == 0) {
-					if (nr == 0) rebalance(n1->parent, 0);
-					else rebalance(nr, 0);
+		if (n1->storage.first == key) {// нашли ключ
+			if (!HasRightChild(n1) && !HasLeftChild(n1)) {
+				if (HasParent(n1)) {
+					if (n1->parent->left == n1) n1->parent->left = 0;
+					else n1->parent->right = 0;
+					rebalance(n1->parent, 0);
 				}
-				else rebalance(startCheck,0);
+				else {
+					root = 0;
+				}
+				delete n1;
+				return true;
 			}
-			delete n1;
-			return true;
+			if (HasRightChild(n1)) {
+				Node<TypeKey, TypeData>* new_root = n1->right; //локалный корень
+				Node<TypeKey, TypeData>* startCheck = 0;
+				while (HasLeftChild(new_root)) {
+					new_root = new_root->left;
+				}//теперь мы в той самой
+				if (new_root->parent != n1) {//если у правово сына нет сына слева, то там меняется код, здесь я проверяю, что сын наш новый локалный корень не сын удаляемой вершины
+					if (HasRightChild(new_root)) {//у бывшего отца корня меняем данные
+						new_root->parent->left = new_root->right;
+						new_root->right->parent = new_root->parent;
+					}
+					else new_root->parent->left = 0;
+					//надо сделать пересчет высот, поэтому запомним самое "низкое" изменение это бывший отец
+					startCheck = new_root->parent;
+				}
+				else {//если наш корень это сын удаляемой вершины, то мы меняем новый корень на его сына, чтобы не падало)
+					if (HasRightChild(new_root))
+						new_root->right->parent = n1;
+					n1->right = new_root->right;
+					startCheck = new_root;//если мы не спускались далеко, то начнем с нового локалный корня
+				}
+				if (!HasParent(n1)) //проверка на корень
+					root = new_root;
+				else if (n1->parent->left == n1)//меняем значение у оца удаляемой вершины
+					n1->parent->left = new_root;
+				else 
+					n1->parent->right = new_root;
+
+				new_root->parent = n1->parent;//меняем значения у нового локалный корня
+				new_root->right = n1->right;
+				if (HasRightChild(new_root))
+					new_root->right->parent = new_root;
+				new_root->left = n1->left;
+				if (HasLeftChild(new_root)) 
+					new_root->left->parent = new_root;
+				rebalance(startCheck, 0);
+				delete n1;
+				return true;
+			}
+			if (HasLeftChild(n1)) {//если нет сына справа, то есть слева
+				Node<TypeKey, TypeData>* new_root = n1->left;
+				if (!HasParent(n1))//проверка на корень
+					root = new_root;
+				else if (n1->parent->left == n1)//меняем данные у отца
+					n1->parent->left = new_root;
+				else
+					n1->parent->right = new_root;
+				new_root->parent = n1->parent;//меняем данные нового локального корня
+				rebalance(new_root, 0);
+				delete n1;
+				return true;
+			}
 		}
+
 	}
 //--------------------------------------------------------------------------------//
 	int getHeight() { //высота для всего дерева

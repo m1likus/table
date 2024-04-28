@@ -109,7 +109,7 @@ TEST(AvlTreeTable, remove_false)
 TEST(AvlTreeTable, test_insert1)
 {
     int s = 0;
-    int N = 1000;
+    int N = 1000;//1000000?
     vector<bool> b(N);
     AvlTreeTable<int, int> a;
     int k = N;
@@ -175,8 +175,8 @@ TEST(AvlTreeTable, test_insert_and_remove_while) {
     }
     int startTreeHeight = a.getHeight(), treeHeight = startTreeHeight;
     int count = 0;
-    while ((treeHeight - startTreeHeight) < 10) {
-        cout << count << " ";
+    for(int i=0;i<100;i++){
+        cout <<"count: "<< count << " " << a.getHeight();
         count++;
         std::shuffle(vec_insert.begin(), vec_insert.end(), g);
         std::shuffle(vec_remove.begin(), vec_remove.end(), g);
@@ -186,12 +186,14 @@ TEST(AvlTreeTable, test_insert_and_remove_while) {
             swap(vec_insert[i], vec_insert[vec_insert.size() - 1]);
             vec_insert.pop_back();
         }
+        cout << " | after insert: " << a.getHeight();
         for (int i = 0; i < 100; i++) {
             a.remove(vec_remove[i]);
             vec_insert.push_back(vec_remove[i]);
             swap(vec_remove[i], vec_remove[vec_remove.size() - 1]);
             vec_remove.pop_back();
         }
+        cout<<" | after remove: " << a.getHeight() << "\n";
         treeHeight = a.getHeight();
     }
     cout << "Total cycles of inserting and removing: " << count << endl;
