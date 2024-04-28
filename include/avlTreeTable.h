@@ -4,22 +4,35 @@
 template <typename TypeKey, typename TypeData>
 class AvlTreeTable : public BinTreeTable<TypeKey, TypeData> {
 private:
-	void recorrect(Node<TypeKey, TypeData>* n) {
+	inline bool HasLeftChild(Node <TypeKey, TypeData>* node) {
+		if (node->left == 0) return false;
+		return true;
+	}
+	inline bool HasRightChild(Node <TypeKey, TypeData>* node) {
+		if (node->right == 0) return false;
+		return true;
+	}
+	inline bool HasParent(Node <TypeKey, TypeData>* node) {
+		if (node->parent == 0) return false;
+		return true;
+	}
+
+	void recorrect(Node<TypeKey, TypeData>* node) {
 		int rh = -1, lh = -1;
-		n->right != 0 ? rh = n->right->height : rh = -1 ;
-		n->left != 0 ? lh = n->left->height : lh = -1;
-		n->height = my_max(lh, rh) + 1;
+		HasRightChild(node) ? rh = node->right->height : rh = -1;
+		HasLeftChild(node)  ? lh = node->left->height : lh = -1;
+		node->height = my_max(lh, rh) + 1;
 	}
 	void smallRight(Node<TypeKey, TypeData>* a) {
 		bool change_root = false;//флаг если корень меняем
 		Node<TypeKey, TypeData>* b = a->left;
-		if (a->parent != 0) 
+		if (HasParent(a)) 
 			if (a->parent->right == a) a->parent->right = b;//меняем у отца a какого то сына на b
 			else a->parent->left = b;
 		else change_root = true; //если отца нет, то мы в корне
 		b->parent = a->parent;//меняем отца b
 
-		if (b->right != 0) b->right->parent = a;//если справа был сын, то меняем ему отца с b на a
+		if (HasRightChild(b)) b->right->parent = a;//если справа был сын, то меняем ему отца с b на a
 		a->left = b->right;//меняем сына
 
 		b->right = a;//меняем сына
@@ -37,14 +50,14 @@ private:
 	void smallLeft(Node<TypeKey, TypeData>* a) {//здесь так же, как и в левом повороте
 		bool change_root = false;
 		Node<TypeKey, TypeData>* b = a->right;
-		if (a->parent != 0) {
+		if (HasParent(a)) {
 			if(a->parent->right==a) a->parent->right = b;
 			else a->parent->left = b;
 		}
 		else change_root = true;
 		b->parent = a->parent;
 
-		if (b->left != 0) b->left->parent = a;
+		if (HasLeftChild(b)) b->left->parent = a;
 		a->right = b->left;
 
 		b->left = a;
@@ -67,10 +80,10 @@ private:
 		smallLeft(a);
 	}
 
-	int difference(Node<TypeKey, TypeData>* n) {
+	int difference(Node<TypeKey, TypeData>* node) {
 		int rh = -1, lh = -1;
-		n->right != 0 ? rh = n->right->height : rh = -1 ;
-		n->left != 0 ? lh = n->left->height : lh = -1;
+		HasRightChild(node) ? rh = node->right->height : rh = -1;
+		node->left != 0 ? lh = node->left->height : lh = -1;
 		return lh - rh;
 	}
 	
@@ -83,10 +96,10 @@ private:
 		int diff_a = 0;
 
 		recorrect(c);//обновляем высоту рассматриваемой верш.
-		while (c->parent != 0) { //идем, пока не дойдем до корня
+		while (HasParent(c)) { //идем, пока не дойдем до корня
 			b = c->parent;
 			recorrect(b);//обновляем высоту отца
-			if (b->parent != 0) { // если у отца есть отец, берем его
+			if (HasParent(b)) { // если у отца есть отец, берем его
 				a = b->parent;
 				recorrect(a);
 			}
@@ -159,7 +172,7 @@ public:
 			while (n2 != 0) { //пока есть куда идти
 				n1 = n2;
 				other_n1 = other_n2;
-				if (other_n1->left != 0 && n1->left == 0) {
+				if (HasLeftChild(other_n1) && !HasLeftChild(n1)) {
 					//если левый потомок в other не пуст, а в this пуст, то
 					other_n2 = other_n1->left; //приходим в левый потомок other
 					n2 = new Node<TypeKey, TypeData>(); //раз пуст, то создадим новый узел
@@ -170,7 +183,7 @@ public:
 					n2->height = other_n2->height;
 					n1->left = n2; //переходим в потомок this
 				}
-				else if (other_n1->right != 0 && n1->right == 0) {
+				else if (HasRightChild(other_n1) && !HasRightChild(n1)) {
 					//если правый потомок other не пуст, а в this пуст, то
 					other_n2 = other_n1->right; //переходим в правый потомок other
 					n2 = new Node<TypeKey, TypeData>(); //создаем новый узел
@@ -211,7 +224,7 @@ public:
 					while (n2 != 0) {
 						n1 = n2;
 						other_n1 = other_n2;
-						if (other_n1->left != 0 && n1->left == 0) {
+						if (HasLeftChild(other_n1) && !HasLeftChild(n1)) {
 							other_n2 = other_n1->left;
 							n2 = new Node<TypeKey, TypeData>();
 							n2->parent = n1;
@@ -221,7 +234,7 @@ public:
 							n2->height = other_n2->height;
 							n1->left = n2;
 						}
-						else if (other_n1->right != 0 && n1->right == 0) {
+						else if (HasRightChild(other_n1) && !HasRightChild(n1)) {
 							other_n2 = other_n1->right;
 							n2 = new Node<TypeKey, TypeData>();
 							n2->parent = n1;
@@ -271,7 +284,7 @@ public:
 					while (n2 != 0) {
 						n1 = n2;
 						other_n1 = other_n2;
-						if (other_n1->left != 0 && n1->left == 0) {
+						if (HasLeftChild(other_n1) && !HasLeftChild(n1)) {
 							other_n2 = other_n1->left;
 							n2 = new Node<TypeKey, TypeData>();
 							n2->parent = n1;
@@ -281,7 +294,7 @@ public:
 							n2->height = other_n2->height;
 							n1->left = n2;
 						}
-						else if (other_n1->right != 0 && n1->right == 0) {
+						else if (HasRightChild(other_n1) && !HasRightChild(n1)) {
 							other_n2 = other_n1->right;
 							n2 = new Node<TypeKey, TypeData>();
 							n2->parent = n1;
@@ -291,7 +304,7 @@ public:
 							n2->height = other_n2->height;
 							n1->right = n2;
 						}
-						else if (other_n1->left == 0 && n1->left != 0) {
+						else if (!HasLeftChild(other_n1) && HasLeftChild(n1)) {
 							Node<TypeKey, TypeData>* n_n1 = n1->left;
 							Node<TypeKey, TypeData>* n_n2 = n1->left;
 							while (n_n2 != NULL) {
@@ -313,7 +326,7 @@ public:
 							delete n_n2;
 							n1->left = 0;
 						}
-						else if (other_n1->right == 0 && n1->right != 0) {
+						else if (!HasRightChild(other_n1) && HasRightChild(n1)) {
 							Node<TypeKey, TypeData>* n_n1 = n1->right;
 							Node<TypeKey, TypeData>* n_n2 = n1->right;
 							while (n_n2 != NULL) {
@@ -392,17 +405,17 @@ public:
 			return false;
 		if (n1->storage.first == key) {// нашли ключ
 			Node<TypeKey, TypeData>* nr = 0;//новый "локальный" корень, который будет вместо удаленной ноды
-			if (n1->right != 0) {//если есть справа
+			if (HasRightChild(n1)) {//если есть справа
 				nr = n1->right; //запоминаем правую ноду от удаленной, он новый "локальный" корень
 				Node<TypeKey, TypeData>* n2 = nr;//пойдем влево до конца, туда запишем левую ноду удаленной ноды
-				while (n2->left != 0)
+				while (HasLeftChild(n2))
 					n2 = n2->left;
 				n2->left = n1->left;//здесь записываем
-				if (n1->left != 0)
+				if (HasLeftChild(n1))
 					n1->left->parent = n2;
 				startCheck = n2;//как раз здесь мы запоминаем, где начать, чтобы не искать потом
 			}
-			else if (n1->left != 0)//если справа нет и слева есть, то просто левую оставляем
+			else if (HasLeftChild(n1))//если справа нет и слева есть, то просто левую оставляем
 				nr = n1->left;
 
 			
