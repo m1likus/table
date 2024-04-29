@@ -145,6 +145,9 @@ private:
 			c = b;
 		}
 	}
+	//void rebalance1(Node<TypeKey, TypeData>* n) {
+
+	//}
 
 	int my_max(int a, int b) {
 		return a >= b ? a : b;
@@ -425,6 +428,7 @@ public:
 					tmp->right = DeleteNode->right;
 					DeleteNode = 0;
 				}
+				rebalance(tmp,0);
 			}
 			else if (HasLeftChild(DeleteNode)) {//т.е есть слева, нет справа
 				tmp = DeleteNode->left;
@@ -432,9 +436,14 @@ public:
 				if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = tmp;
 				else if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = tmp;
 				DeleteNode = 0;
+				rebalance(tmp, 0);
 			}
-			else
+			else {
+				if (HasParent(DeleteNode))
+					tmp = DeleteNode->parent;
 				DeleteNode = 0;
+				if (tmp != 0) rebalance(tmp,0);
+			}
 			return true;
 		}
 	}

@@ -106,30 +106,31 @@ TEST(AvlTreeTable, remove_false)
     EXPECT_EQ(x, false);
 }
 
-//TEST(AvlTreeTable, test_insert1)
-//{
-//    int s = 0;
-//    int N = 1000;
-//    vector<bool> b(N);
-//    AvlTreeTable<int, int> a;
-//    int k = N;
-//    while (k != 1) {
-//        k /= 2;
-//        for (int i = k; i < N; i += k) {
-//            if (!b[i])
-//                a.insert(i, 20);
-//            b[i] = 1;
-//        }
-//    }
-//    a.insert(0, 20);
-//
-//    for (auto i = a.begin(); i != a.end(); ++i) {
-//        (*i)++;
-//    }
-//    for (int i = 0; i < N; i++) {
-//        EXPECT_EQ(a[i], 21);
-//    }
-//}
+TEST(AvlTreeTable, test_insert1)
+{
+    int s = 0;
+    int N = 1000;
+    vector<bool> b(N);
+    AvlTreeTable<int, int> a;
+    int k = N;
+    while (k != 1) {
+        k /= 2;
+        for (int i = k; i < N; i += k) {
+            if (!b[i])
+                a.insert(i, 20);
+            b[i] = 1;
+        }
+    }
+    a.insert(0, 20);
+
+    for (auto i = a.begin(); i != a.end(); ++i) {
+        (*i)++;
+    }
+    for (int i = 0; i < N; i++) {
+        EXPECT_EQ(a[i], 21);
+    }
+}
+
 //TEST(AvlTreeTable, test_remove1)
 //{
 //    int s = 0;
@@ -148,13 +149,14 @@ TEST(AvlTreeTable, remove_false)
 //    a.insert(0, 20);
 //
 //    for (int i = 0; i < N; i++) {
-//        if (i == 94) {
-//            i = 94;
-//        }
-//        a.remove(i);
+//        if (i == 89)
+//            i = 89;
+//        a.remove1(i);
 //    }
-//}
 //
+//    EXPECT_EQ(*(a.begin()), 0);
+//}
+
 //TEST(AvlTreeTable, test_insert_and_remove_while) {
 //    int avlTreeN = 1000;
 //    int N = 2000;
@@ -187,7 +189,7 @@ TEST(AvlTreeTable, remove_false)
 //            vec_insert.pop_back();
 //        }
 //        for (int i = 0; i < 100; i++) {
-//            a.remove(vec_remove[i]);
+//            a.remove1(vec_remove[i]);
 //            vec_insert.push_back(vec_remove[i]);
 //            swap(vec_remove[i], vec_remove[vec_remove.size() - 1]);
 //            vec_remove.pop_back();
@@ -197,6 +199,7 @@ TEST(AvlTreeTable, remove_false)
 //    cout << "Total cycles of inserting and removing: " << count << endl;
 //    ASSERT_EQ(a.size(), avlTreeN);
 //}
+
 //TEST(AvlTreeTable, test_height) {
 //    AvlTreeTable<int, int> a;
 //    a.insert(0, 0);
