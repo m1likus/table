@@ -178,7 +178,7 @@ private:
 			c = b;
 		}
 		//если не сработали малые повороты, то надо пройтись большими поворотами
-		c = n; diff_c = 0; diff_b = 0; diff_a = 0;
+		c = n; diff_c = 0; diff_b = 0; diff_a = 0; b = 0; a = 0;
 		if (HasParent(c)) b = c->parent;
 		while (HasParent(c) && HasParent(b)) {
 			b = c->parent;
@@ -463,29 +463,12 @@ public:
 					tmp = tmp->left; //нашли min
 				//переприсваиваем
 				if (DeleteNode->right == tmp) { //правым сыном DeleteNode м.б. сама tmp
-					if (DeleteNode == root) root = tmp;
-					tmp->parent = DeleteNode->parent;
-					if (HasParent(DeleteNode)) {
-						if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = tmp;
-						else if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = tmp;
-					}
-					tmp->left = DeleteNode->left;
 					if (HasLeftChild(DeleteNode)) {
 						DeleteNode->left->parent = tmp;
 					}
-					tmp->height = DeleteNode->height;
-					DeleteNode = 0;
-					rebalance1(tmp);
 				}
 				else {
-					if (DeleteNode == root) root = tmp;
 					tmp->parent->left = tmp->right;
-					tmp->parent = DeleteNode->parent;
-					if (HasParent(DeleteNode)) {
-						if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = tmp;
-						else if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = tmp;
-					}
-					tmp->left = DeleteNode->left;
 					if (HasLeftChild(DeleteNode)) {
 						DeleteNode->left->parent = tmp;
 					}
@@ -493,10 +476,17 @@ public:
 					if (HasRightChild(DeleteNode)) {
 						DeleteNode->right->parent = tmp;
 					}
-					tmp->height = DeleteNode->height;
-					DeleteNode = 0;
-					rebalance1(tmp);
 				}
+				if (DeleteNode == root) root = tmp;
+				if (HasParent(DeleteNode)) {
+					if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = tmp;
+					else if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = tmp;
+				}
+				tmp->parent = DeleteNode->parent;
+				tmp->left = DeleteNode->left;
+				tmp->height = DeleteNode->height;
+				rebalance1(tmp);
+				DeleteNode = 0;
 			}
 			else if (HasLeftChild(DeleteNode)) {//т.е есть слева, нет справа
 				if (DeleteNode == root) root = tmp;
@@ -525,6 +515,15 @@ public:
 	}
 
 
+
+//--------------------------------------------------------------------------------//
+	int getHeight() { //высота для всего дерева
+		return root->height;
+	}
+};
+
+
+/*
 	bool remove(const TypeKey& key) {
 		Node<TypeKey, TypeData>* n1 = root; //начинаем с корня
 		Node<TypeKey, TypeData>* startCheck = 0;
@@ -547,7 +546,7 @@ public:
 			else if (HasLeftChild(n1))//если справа нет и слева есть, то просто левую оставляем
 				nr = n1->left;
 
-			
+
 			if (nr == 0 && n1->parent == 0) {//сыновей не было, не было отца, значит корень
 				root = 0;
 			}
@@ -572,9 +571,7 @@ public:
 			return true;
 		}
 	}
-//--------------------------------------------------------------------------------//
-	int getHeight() { //высота для всего дерева
-		return root->height;
-	}
-};
 
+
+
+*/
