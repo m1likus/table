@@ -188,7 +188,7 @@ private:
 			if (diff_c <= 0 && diff_b == -2) {
 				smallLeft1(b);
 			}
-			else if (diff_c <= 0 && diff_b == 2) {
+			else if (diff_c >= 0 && diff_b == 2) {
 				smallRight1(b);
 			}
 			c = b;
@@ -205,10 +205,10 @@ private:
 			diff_c = difference(c);
 			diff_b = difference(b);
 			diff_a = difference(a);
-			if (diff_c <= 1 && diff_b == 1 && diff_a == -2) {
+			if (/*diff_c <= 1 &&*/ diff_b == 1 && diff_a == -2) {
 				bigLeft1(a);
 			}
-			else if (diff_c <= 1 && diff_b == -1 && diff_a == 2) {
+			else if (/*diff_c <= 1 && */ diff_b == -1 && diff_a == 2) {
 				bigRight1(a);
 			}
 			c = b;
@@ -486,6 +486,7 @@ public:
 				}
 				else {
 					tmp->parent->left = tmp->right;
+					if (HasRightChild(tmp)) tmp->right->parent = tmp->parent;//
 					if (HasLeftChild(DeleteNode)) {
 						DeleteNode->left->parent = tmp;
 					}
