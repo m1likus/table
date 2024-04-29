@@ -85,9 +85,6 @@ private:
 		smallRight(a->right);
 		smallLeft(a);
 	}
-
-
-	
 	void rebalance(Node<TypeKey, TypeData>* n, bool type) {
  		Node<TypeKey, TypeData>* c = n;
 		Node<TypeKey, TypeData>* b = 0;
@@ -113,21 +110,8 @@ private:
 			diff_a = 0;
 			if (a != 0) diff_a = difference(a);
 
-			if (diff_c <= 0 && diff_b == -2) {//и по поворотам
-				smallLeft(b);//при поворотах мы меняем и вот эта b смещается, но почему то ошибок нет, возможно мы одно делаем много лишних действий
-							//c=b; b=b->parent ?
-				// 	 b
-				// /   \
-				// P    c
-				//	   / \
-				//    Q   R
-				//
-				//		c
-				//     / \
-				//    b   R 
-				//   / \
-				//  P   Q
-				// 
+			if (diff_c <= 0 && diff_b == -2) {
+				smallLeft(b);
 				if (type) return;
 			}
 			else if (diff_c <= 0 && diff_b == 2) {
@@ -145,9 +129,75 @@ private:
 			c = b;
 		}
 	}
-	//void rebalance1(Node<TypeKey, TypeData>* n) {
 
-	//}
+
+
+	void smallRight1(Node<TypeKey, TypeData>* a) {
+		Node<TypeKey, TypeData>* b = a->left;
+		a->left = b->right;
+		b->right = a;
+		recorrect(a);
+		recorrect(b);
+	}
+	void smallLeft1(Node<TypeKey, TypeData>* a) {
+		Node<TypeKey, TypeData>* b = a->right;
+		a->right = b->left;
+		b->left = a;
+		recorrect(a);
+		recorrect(b);
+	}
+	void bigRight1(Node<TypeKey, TypeData>* a) {
+		smallLeft1(a->left);
+		smallRight1(a);
+	}
+	void bigLeft1(Node<TypeKey, TypeData>* a) {
+		smallRight1(a->right);
+		smallLeft1(a);
+	}
+	void rebalance1(Node<TypeKey, TypeData>* n) {
+		Node<TypeKey, TypeData>* c = n;
+		Node<TypeKey, TypeData>* b = 0;
+		Node<TypeKey, TypeData>* a = 0;
+		int diff_c = 0;
+		int diff_b = 0;
+		int diff_a = 0;
+
+		recorrect(c);
+		while (HasParent(c)) {
+			b = c->parent;
+			recorrect(b);
+			//для малого поворота нужно 2 верш. : c и b.
+			diff_c = difference(c);
+			diff_b = difference(b);
+			if (diff_c <= 0 && diff_b == -2) {
+				smallLeft1(b);
+			}
+			else if (diff_c <= 0 && diff_b == 2) {
+				smallRight1(b);
+			}
+			c = b;
+		}
+		//если не сработали малые повороты, то надо пройтись большими поворотами
+		c = n; diff_c = 0; diff_b = 0; diff_a = 0;
+		if (HasParent(c)) b = c->parent;
+		while (HasParent(c) && HasParent(b)) {
+			b = c->parent;
+			a = b->parent;
+			recorrect(b);
+			recorrect(a);
+			diff_c = difference(c);
+			diff_b = difference(b);
+			diff_a = difference(a);
+			if (diff_c <= 1 && diff_b == 1 && diff_a == -2) {
+				bigLeft1(a);
+			}
+			else if (diff_c <= 1 && diff_b == -1 && diff_a == 2) {
+				bigRight1(a);
+			}
+			c = b;
+			b = a;
+		}
+	}
 
 	int my_max(int a, int b) {
 		return a >= b ? a : b;
@@ -391,7 +441,7 @@ public:
 					n2->right = n1;
 				else
 					n2->left = n1;
-				rebalance(n1, 1);
+				rebalance(n1,1);
 			}
 			else if (n1->storage.first == key) {
 				n1->storage.second = d;
@@ -413,36 +463,62 @@ public:
 					tmp = tmp->left; //нашли min
 				//переприсваиваем
 				if (DeleteNode->right == tmp) { //правым сыном DeleteNode м.б. сама tmp
+					if (DeleteNode == root) root = tmp;
 					tmp->parent = DeleteNode->parent;
-					if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = tmp;
-					else if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = tmp;
+					if (HasParent(DeleteNode)) {
+						if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = tmp;
+						else if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = tmp;
+					}
 					tmp->left = DeleteNode->left;
+					if (HasLeftChild(DeleteNode)) {
+						DeleteNode->left->parent = tmp;
+					}
+					tmp->height = DeleteNode->height;
 					DeleteNode = 0;
+					rebalance1(tmp);
 				}
 				else {
+					if (DeleteNode == root) root = tmp;
 					tmp->parent->left = tmp->right;
 					tmp->parent = DeleteNode->parent;
-					if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = tmp;
-					else if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = tmp;
+					if (HasParent(DeleteNode)) {
+						if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = tmp;
+						else if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = tmp;
+					}
 					tmp->left = DeleteNode->left;
+					if (HasLeftChild(DeleteNode)) {
+						DeleteNode->left->parent = tmp;
+					}
 					tmp->right = DeleteNode->right;
+					if (HasRightChild(DeleteNode)) {
+						DeleteNode->right->parent = tmp;
+					}
+					tmp->height = DeleteNode->height;
 					DeleteNode = 0;
+					rebalance1(tmp);
 				}
-				rebalance(tmp,0);
 			}
 			else if (HasLeftChild(DeleteNode)) {//т.е есть слева, нет справа
+				if (DeleteNode == root) root = tmp;
 				tmp = DeleteNode->left;
 				tmp->parent = DeleteNode->parent;
-				if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = tmp;
-				else if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = tmp;
+				if (HasParent(DeleteNode)) {
+					if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = tmp;
+					else if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = tmp;
+				}
+				tmp->height = DeleteNode->height;
+				rebalance1(tmp);
 				DeleteNode = 0;
-				rebalance(tmp, 0);
 			}
 			else {
-				if (HasParent(DeleteNode))
+				if (DeleteNode == root) root = tmp;
+				if (HasParent(DeleteNode)) {
 					tmp = DeleteNode->parent;
+					if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = 0;
+					else if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = 0;
+				}
 				DeleteNode = 0;
-				if (tmp != 0) rebalance(tmp,0);
+				if (tmp!=0)rebalance1(tmp);
 			}
 			return true;
 		}
