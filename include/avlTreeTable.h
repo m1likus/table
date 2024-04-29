@@ -134,15 +134,31 @@ private:
 
 	void smallRight1(Node<TypeKey, TypeData>* a) {
 		Node<TypeKey, TypeData>* b = a->left;
+		if (HasParent(a))
+			if (a->parent->right == a) a->parent->right = b;
+			else a->parent->left = b;
+		else root = b;
+		b->parent = a->parent;
+		if (HasRightChild(b)) b->right->parent = a;
 		a->left = b->right;
 		b->right = a;
+		a->parent = b;
+
 		recorrect(a);
 		recorrect(b);
 	}
 	void smallLeft1(Node<TypeKey, TypeData>* a) {
 		Node<TypeKey, TypeData>* b = a->right;
+		if (HasParent(a))
+			if (a->parent->right == a) a->parent->right = b;
+			else a->parent->left = b;
+		else root = b;
+		b->parent = a->parent;
+		if (HasLeftChild(b)) b->left->parent = a;
 		a->right = b->left;
 		b->left = a;
+		a->parent = b;
+
 		recorrect(a);
 		recorrect(b);
 	}
@@ -182,6 +198,7 @@ private:
 		if (HasParent(c)) b = c->parent;
 		while (HasParent(c) && HasParent(b)) {
 			b = c->parent;
+			if (!HasParent(b)) break;
 			a = b->parent;
 			recorrect(b);
 			recorrect(a);
@@ -441,7 +458,7 @@ public:
 					n2->right = n1;
 				else
 					n2->left = n1;
-				rebalance(n1,1);
+				rebalance1(n1);
 			}
 			else if (n1->storage.first == key) {
 				n1->storage.second = d;

@@ -149,30 +149,30 @@ TEST(AvlTreeTable, test_remove2) {
 
 
 
-//TEST(AvlTreeTable, test_remove1)
-//{
-//    int s = 0;
-//    int N = 1000;
-//    vector<bool> b(N);
-//    AvlTreeTable<int, int> a;
-//    int k = N;
-//    while (k != 1) {
-//        k /= 2;
-//        for (int i = k; i < N; i += k) {
-//            if (!b[i])
-//                a.insert(i, 20);
-//            b[i] = 1;
-//        }
-//    }
-//    a.insert(0, 20);
-//
-//    for (int i = 0; i < N; i++) {
-//        if (i == 372) {
-//            i = 372;
-//        }
-//        a.remove1(i);
-//    }
-//}
+TEST(AvlTreeTable, test_remove1)
+{
+    int s = 0;
+    int N = 1000;
+    vector<bool> b(N);
+    AvlTreeTable<int, int> a;
+    int k = N;
+    while (k != 1) {
+        k /= 2;
+        for (int i = k; i < N; i += k) {
+            if (!b[i])
+                a.insert(i, 20);
+            b[i] = 1;
+        }
+    }
+    a.insert(0, 20);
+
+    for (int i = 0; i < N; i++) {
+        if (i == 48) {
+            i = 48;
+        }
+        a.remove1(i);
+    }
+}
 
 //TEST(AvlTreeTable, test_insert_and_remove_while) {
 //    int avlTreeN = 1000;
