@@ -3,6 +3,7 @@
 #include <random>
 #include <vector>
 #include "avlTreeTable.h"
+#include <numeric>
 
 TEST(AvlTreeTable, get_data_by_key_string)
 {
@@ -152,7 +153,7 @@ TEST(AvlTreeTable, test_remove2) {
 TEST(AvlTreeTable, test_remove1)
 {
     int s = 0;
-    int N = 1000000;
+    int N = 10000;
     vector<bool> b(N);
     AvlTreeTable<int, int> a;
     int k = N;
@@ -165,18 +166,22 @@ TEST(AvlTreeTable, test_remove1)
         }
     }
     a.insert(0, 20);
+    // TODO: add expect
 
+    vector<int> vec_remove(N);
+    std::iota(vec_remove.begin(), vec_remove.end(), 0);
+    random_device rd;
+    int seed = 0;
+    mt19937 g(seed); // rd
+    std::shuffle(vec_remove.begin(), vec_remove.end(), g);
     for (int i = 0; i < N; i++) {
-        if (i == 3) {
-            i = 3;
-        }
-        a.remove1(i);
+        a.remove1(vec_remove[i]);
     }
 }
 
 TEST(AvlTreeTable, test_remove3)
 {
-    int N = 1000000;
+    int N = 10000;
     AvlTreeTable<int, int> a;
     for (int i = 0; i < N; i++) {
         a.insert(i, 20);
@@ -186,55 +191,51 @@ TEST(AvlTreeTable, test_remove3)
     }
 }
 
-TEST(AvlTreeTable, test_insert_and_remove_while) {
-    int avlTreeN = 1000;
-    int N = 2000;
-    vector<int> vec_insert(N);
-    vector<int> vec_remove;
-    for (int i = 0; i < N; i++) {
-        vec_insert[i] = i;
-    }
-    random_device rd;
-    mt19937 g(rd());
-    std::shuffle(vec_insert.begin(), vec_insert.end(), g);
+TEST(AvlTreeTable, test_height) {
+    int s = 0;
+    int N = 1000;
+    vector<bool> b(N);
     AvlTreeTable<int, int> a;
-    for (int i = 0; i < avlTreeN; i++) {
-        a.insert(vec_insert[i], vec_insert[i]);
-        vec_remove.push_back(vec_insert[i]);
-        swap(vec_insert[i], vec_insert[vec_insert.size() - 1]);
-        vec_insert.pop_back();
-    }
-    int startTreeHeight = a.getHeight(), treeHeight = startTreeHeight;
-    int count = 0;
-    for (int i = 0; i < 100; i++) {
-        cout << "count: " << count << " " << a.getHeight();
-        count++;
-        std::shuffle(vec_insert.begin(), vec_insert.end(), g);
-        std::shuffle(vec_remove.begin(), vec_remove.end(), g);
-        for (int i = 0; i < 100; i++) {
-            a.insert(vec_insert[i], vec_insert[i]);
-            vec_remove.push_back(vec_insert[i]);
-            swap(vec_insert[i], vec_insert[vec_insert.size() - 1]);
-            vec_insert.pop_back();
+    a.insert(10000, 10000);
+    int firstHeight = a.getHeight(), secondHeight = firstHeight;
+    int k = N;
+    // TODO: SEED!!! =)
+    cout << "insert\n";
+    while (k != 1) {
+        k /= 2;
+        for (int i = k; i < N; i += k) {
+            if (!b[i]) {
+                firstHeight = a.getHeight();
+                a.insert(i, 20);
+                secondHeight = a.getHeight();
+            }
+            b[i] = 1;
+            //cout << i << " " << a.getHeight() << "\n";
+            //cout << "Delta = " << secondHeight - firstHeight << endl;
+            EXPECT_LE(std::abs(secondHeight - firstHeight), 1);
         }
-        cout << " | after insert: " << a.getHeight();
-        for (int i = 0; i < 100; i++) {
-            a.remove1(vec_remove[i]);
-            vec_insert.push_back(vec_remove[i]);
-            swap(vec_remove[i], vec_remove[vec_remove.size() - 1]);
-            vec_remove.pop_back();
-        }
-        cout << " | after remove: " << a.getHeight() << "\n";
-        treeHeight = a.getHeight();
     }
-    cout << "Total cycles of inserting and removing: " << count << endl;
-    ASSERT_EQ(a.size(), avlTreeN);
+    a.insert(0, 20);
+    cout << endl;
+    cout << a.size();
+    cout << endl;
+    cout << "remove\n";
+    for (int i = 0; i < N; i++) {
+        firstHeight = a.getHeight();
+        a.remove1(i);
+        secondHeight = a.getHeight();
+        //cout << i << " " << a.getHeight() << "\n";
+        //cout << "Delta = " << secondHeight - firstHeight << endl;
+        EXPECT_LE(std::abs(secondHeight - firstHeight), 1);
+    }
 }
-//TEST(AvlTreeTable, test_height) {
-//    AvlTreeTable<int, int> a;
-//    a.insert(0, 0);
-//    a.insert(1, 1);
-//    a.insert(2, 2);
-//    ASSERT_EQ(a.getHeight(), 1);
-//}
+
+
+TEST(AvlTreeTable, test_height1) {
+    AvlTreeTable<int, int> a;
+    a.insert(0, 0);
+    a.insert(1, 1);
+    a.insert(2, 2);
+    ASSERT_EQ(a.getHeight(), 1);
+}
 

@@ -29,109 +29,7 @@ private:
 		return lh - rh;
 	}
 
-	void smallRight(Node<TypeKey, TypeData>* a) {
-		bool change_root = false;//флаг если корень меняем
-		Node<TypeKey, TypeData>* b = a->left;
-		if (HasParent(a)) 
-			if (a->parent->right == a) a->parent->right = b;//меняем у отца a какого то сына на b
-			else a->parent->left = b;
-		else change_root = true; //если отца нет, то мы в корне
-		b->parent = a->parent;//меняем отца b
-
-		if (HasRightChild(b)) b->right->parent = a;//если справа был сын, то меняем ему отца с b на a
-		a->left = b->right;//меняем сына
-
-		b->right = a;//меняем сына
-		a->parent = b;//меняем отца
-
-		a = b;//поменяем их местами, а то я запутался
-		b = a->right;
-
-		if (change_root) root = a;
-
-		recorrect(b);
-		recorrect(a);
-		
-	}
-	void smallLeft(Node<TypeKey, TypeData>* a) {//здесь так же, как и в левом повороте
-		bool change_root = false;
-		Node<TypeKey, TypeData>* b = a->right;
-		if (HasParent(a)) {
-			if(a->parent->right==a) a->parent->right = b;
-			else a->parent->left = b;
-		}
-		else change_root = true;
-		b->parent = a->parent;
-
-		if (HasLeftChild(b)) b->left->parent = a;
-		a->right = b->left;
-
-		b->left = a;
-		a->parent = b;
-
-		a = b;
-		b = a->left;
-
-		if (change_root) root = a;
-
-		recorrect(b);
-		recorrect(a);
-	}
-	void bigRight(Node<TypeKey, TypeData>* a) {
-		smallLeft(a->left);
-		smallRight(a);
-	}
-	void bigLeft(Node<TypeKey, TypeData>* a) {
-		smallRight(a->right);
-		smallLeft(a);
-	}
-	void rebalance(Node<TypeKey, TypeData>* n, bool type) {
- 		Node<TypeKey, TypeData>* c = n;
-		Node<TypeKey, TypeData>* b = 0;
-		Node<TypeKey, TypeData>* a = 0;
-		int diff_c = 0;
-		int diff_b = 0;
-		int diff_a = 0;
-
-		recorrect(c);//обновляем высоту рассматриваемой верш.
-		while (HasParent(c)) { //идем, пока не дойдем до корня
-			b = c->parent;
-			recorrect(b);//обновляем высоту отца
-			if (HasParent(b)) { // если у отца есть отец, берем его
-				a = b->parent;
-				recorrect(a);
-			}
-			else a = 0;
-
-			//делаем повороты
-			
-			diff_c = difference(c);
-			diff_b = difference(b);
-			diff_a = 0;
-			if (a != 0) diff_a = difference(a);
-
-			if (diff_c <= 0 && diff_b == -2) {
-				smallLeft(b);
-				if (type) return;
-			}
-			else if (diff_c <= 0 && diff_b == 2) {
-				smallRight(b);
-				if (type) return;
-			}
-			else if (diff_c <= 1 && diff_b == 1 && diff_a == -2) {
-				bigLeft(a);
-				if (type) return;
-			}
-			else if (diff_c <= 1 && diff_b == -1 && diff_a == 2) {
-				bigRight(a);
-				if (type) return;
-			}
-			c = b;
-		}
-	}
-
-
-
+	
 	void smallRight1(Node<TypeKey, TypeData>* a) {
 		Node<TypeKey, TypeData>* b = a->left;
 		if (HasParent(a))
@@ -214,6 +112,12 @@ private:
 			c = b;
 			b = a;
 		}
+		c = n;
+		b = 0;
+		//while (c != 0) {
+		//	recorrect(c);
+		//	c = c->parent;
+		//}
 	}
 
 	int my_max(int a, int b) {
@@ -536,6 +440,7 @@ public:
 
 //--------------------------------------------------------------------------------//
 	int getHeight() { //высота для всего дерева
+		if (root == 0) return -1;
 		return root->height;
 	}
 };
@@ -589,6 +494,108 @@ public:
 			return true;
 		}
 	}
+
+	void smallRight(Node<TypeKey, TypeData>* a) {
+		bool change_root = false;//флаг если корень меняем
+		Node<TypeKey, TypeData>* b = a->left;
+		if (HasParent(a))
+			if (a->parent->right == a) a->parent->right = b;//меняем у отца a какого то сына на b
+			else a->parent->left = b;
+		else change_root = true; //если отца нет, то мы в корне
+		b->parent = a->parent;//меняем отца b
+
+		if (HasRightChild(b)) b->right->parent = a;//если справа был сын, то меняем ему отца с b на a
+		a->left = b->right;//меняем сына
+
+		b->right = a;//меняем сына
+		a->parent = b;//меняем отца
+
+		a = b;//поменяем их местами, а то я запутался
+		b = a->right;
+
+		if (change_root) root = a;
+
+		recorrect(b);
+		recorrect(a);
+
+	}
+	void smallLeft(Node<TypeKey, TypeData>* a) {//здесь так же, как и в левом повороте
+		bool change_root = false;
+		Node<TypeKey, TypeData>* b = a->right;
+		if (HasParent(a)) {
+			if(a->parent->right==a) a->parent->right = b;
+			else a->parent->left = b;
+		}
+		else change_root = true;
+		b->parent = a->parent;
+
+		if (HasLeftChild(b)) b->left->parent = a;
+		a->right = b->left;
+
+		b->left = a;
+		a->parent = b;
+
+		a = b;
+		b = a->left;
+
+		if (change_root) root = a;
+
+		recorrect(b);
+		recorrect(a);
+	}
+	void bigRight(Node<TypeKey, TypeData>* a) {
+		smallLeft(a->left);
+		smallRight(a);
+	}
+	void bigLeft(Node<TypeKey, TypeData>* a) {
+		smallRight(a->right);
+		smallLeft(a);
+	}
+	void rebalance(Node<TypeKey, TypeData>* n, bool type) {
+		Node<TypeKey, TypeData>* c = n;
+		Node<TypeKey, TypeData>* b = 0;
+		Node<TypeKey, TypeData>* a = 0;
+		int diff_c = 0;
+		int diff_b = 0;
+		int diff_a = 0;
+
+		recorrect(c);//обновляем высоту рассматриваемой верш.
+		while (HasParent(c)) { //идем, пока не дойдем до корня
+			b = c->parent;
+			recorrect(b);//обновляем высоту отца
+			if (HasParent(b)) { // если у отца есть отец, берем его
+				a = b->parent;
+				recorrect(a);
+			}
+			else a = 0;
+
+			//делаем повороты
+
+			diff_c = difference(c);
+			diff_b = difference(b);
+			diff_a = 0;
+			if (a != 0) diff_a = difference(a);
+
+			if (diff_c <= 0 && diff_b == -2) {
+				smallLeft(b);
+				if (type) return;
+			}
+			else if (diff_c <= 0 && diff_b == 2) {
+				smallRight(b);
+				if (type) return;
+			}
+			else if (diff_c <= 1 && diff_b == 1 && diff_a == -2) {
+				bigLeft(a);
+				if (type) return;
+			}
+			else if (diff_c <= 1 && diff_b == -1 && diff_a == 2) {
+				bigRight(a);
+				if (type) return;
+			}
+			c = b;
+		}
+	}
+
 
 
 
