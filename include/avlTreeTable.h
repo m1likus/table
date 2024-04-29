@@ -16,13 +16,19 @@ private:
 		if (node->parent == 0) return false;
 		return true;
 	}
-
 	void recorrect(Node<TypeKey, TypeData>* node) {
 		int rh = -1, lh = -1;
 		HasRightChild(node) ? rh = node->right->height : rh = -1;
 		HasLeftChild(node)  ? lh = node->left->height : lh = -1;
 		node->height = my_max(lh, rh) + 1;
 	}
+	int difference(Node<TypeKey, TypeData>* node) {
+		int rh = -1, lh = -1;
+		HasRightChild(node) ? rh = node->right->height : rh = -1;
+		node->left != 0 ? lh = node->left->height : lh = -1;
+		return lh - rh;
+	}
+
 	void smallRight(Node<TypeKey, TypeData>* a) {
 		bool change_root = false;//флаг если корень меняем
 		Node<TypeKey, TypeData>* b = a->left;
@@ -80,12 +86,7 @@ private:
 		smallLeft(a);
 	}
 
-	int difference(Node<TypeKey, TypeData>* node) {
-		int rh = -1, lh = -1;
-		HasRightChild(node) ? rh = node->right->height : rh = -1;
-		node->left != 0 ? lh = node->left->height : lh = -1;
-		return lh - rh;
-	}
+
 	
 	void rebalance(Node<TypeKey, TypeData>* n, bool type) {
  		Node<TypeKey, TypeData>* c = n;
@@ -396,6 +397,49 @@ public:
 		}
 	}
 //--------------------------------------------------------------------------------//
+	bool remove1(const TypeKey & key) {
+		Node<TypeKey, TypeData>* DeleteNode = root;
+		while (DeleteNode !=0 && DeleteNode->storage.first != key)
+			DeleteNode->storage.first < key ? DeleteNode = DeleteNode->right : DeleteNode = DeleteNode->left;
+		if (DeleteNode == 0) return false;
+		else if (DeleteNode->storage.first == key) {
+			Node<TypeKey, TypeData>* tmp = 0;
+			if (HasRightChild(DeleteNode)) {
+				tmp = DeleteNode->right;
+				while (HasLeftChild(tmp))
+					tmp = tmp->left; //нашли min
+				//переприсваиваем
+				if (DeleteNode->right == tmp) { //правым сыном DeleteNode м.б. сама tmp
+					tmp->parent = DeleteNode->parent;
+					if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = tmp;
+					else if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = tmp;
+					tmp->left = DeleteNode->left;
+					DeleteNode = 0;
+				}
+				else {
+					tmp->parent->left = tmp->right;
+					tmp->parent = DeleteNode->parent;
+					if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = tmp;
+					else if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = tmp;
+					tmp->left = DeleteNode->left;
+					tmp->right = DeleteNode->right;
+					DeleteNode = 0;
+				}
+			}
+			else if (HasLeftChild(DeleteNode)) {//т.е есть слева, нет справа
+				tmp = DeleteNode->left;
+				tmp->parent = DeleteNode->parent;
+				if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = tmp;
+				else if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = tmp;
+				DeleteNode = 0;
+			}
+			else
+				DeleteNode = 0;
+			return true;
+		}
+	}
+
+
 	bool remove(const TypeKey& key) {
 		Node<TypeKey, TypeData>* n1 = root; //начинаем с корня
 		Node<TypeKey, TypeData>* startCheck = 0;
