@@ -13,6 +13,7 @@ public:
 	Node* right;
 	Node* parent;
 	int height;
+	bool colour;//false - black, true - red
 
 	bool operator==(const Node& other) {
 		if (key == other.key && data == other.data)
