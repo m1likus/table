@@ -93,7 +93,7 @@ TEST(AvlTreeTable, remove_true)
     int data = 10;
     AvlTreeTable<string, int> a;
     a.insert("key", data);
-    bool x = a.remove1("key");
+    bool x = a.remove("key");
     EXPECT_EQ(x, true);
 }
 
@@ -103,7 +103,7 @@ TEST(AvlTreeTable, remove_false)
     int data = 10;
     AvlTreeTable<string, int> a;
     a.insert("key", data);
-    bool x = a.remove1("key + 1");
+    bool x = a.remove("key + 1");
     EXPECT_EQ(x, false);
 }
 
@@ -143,8 +143,8 @@ TEST(AvlTreeTable, test_remove2) {
     a.insert(125, 0);
     a.insert(175, 0);
 
-    a.remove1(200);
-    a.remove1(350);
+    a.remove(200);
+    a.remove(350);
 
 }
 
@@ -183,7 +183,7 @@ TEST(AvlTreeTable, test_insert_and_remove_while_delta) {
         }
         for (int i = 0; i < 100; i++) {
             int firstHeight = a.getHeight();
-            EXPECT_NO_THROW(a.remove1(vec_remove[i]));
+            EXPECT_NO_THROW(a.remove(vec_remove[i]));
             int secondHeight = a.getHeight();
             EXPECT_LE(std::abs(secondHeight - firstHeight), 1);
             vec_insert.push_back(vec_remove[i]);
@@ -201,7 +201,7 @@ TEST(AvlTreeTable, test_remove3)
         a.insert(i, 20);
     }
     for (int i = 0; i < N; i++) {
-        a.remove1(i);
+        a.remove(i);
     }
 }
 

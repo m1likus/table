@@ -7,6 +7,7 @@
 #include "hashTable.h"
 #include "binTreeTable.h"
 #include "avlTreeTable.h"
+#include "rbTreeTable.h"
 #include <string>
 using namespace std;
 

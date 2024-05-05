@@ -5,6 +5,12 @@
 template <typename TypeKey, typename T>
 class binTreeIterator;
 
+enum TwoColours {
+	black,
+	red
+};
+
+
 template <typename TypeKey, typename TypeData>
 class Node {
 public:
@@ -13,6 +19,7 @@ public:
 	Node* right;
 	Node* parent;
 	int height;
+	TwoColours colour;
 
 	bool operator==(const Node& other) {
 		if (key == other.key && data == other.data)
@@ -29,6 +36,19 @@ public:
 template <typename TypeKey, typename TypeData>
 class BinTreeTable {
 protected:
+	inline bool HasLeftChild(Node <TypeKey, TypeData>* node) {
+		if (node->left == 0) return false;
+		return true;
+	}
+	inline bool HasRightChild(Node <TypeKey, TypeData>* node) {
+		if (node->right == 0) return false;
+		return true;
+	}
+	inline bool HasParent(Node <TypeKey, TypeData>* node) {
+		if (node->parent == 0) return false;
+		return true;
+	}
+
 	Node<TypeKey, TypeData>* root;
 	friend binTreeIterator<TypeKey, TypeData>;
 public:

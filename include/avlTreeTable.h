@@ -4,18 +4,6 @@
 template <typename TypeKey, typename TypeData>
 class AvlTreeTable : public BinTreeTable<TypeKey, TypeData> {
 private:
-	inline bool HasLeftChild(Node <TypeKey, TypeData>* node) {
-		if (node->left == 0) return false;
-		return true;
-	}
-	inline bool HasRightChild(Node <TypeKey, TypeData>* node) {
-		if (node->right == 0) return false;
-		return true;
-	}
-	inline bool HasParent(Node <TypeKey, TypeData>* node) {
-		if (node->parent == 0) return false;
-		return true;
-	}
 	void recorrect(Node<TypeKey, TypeData>* node) {
 		int rh = -1, lh = -1;
 		HasRightChild(node) ? rh = node->right->height : rh = -1;
@@ -30,7 +18,7 @@ private:
 	}
 
 	
-	void smallRight1(Node<TypeKey, TypeData>* a) {
+	void smallRight(Node<TypeKey, TypeData>* a) {
 		Node<TypeKey, TypeData>* b = a->left;
 		if (HasParent(a))
 			if (a->parent->right == a) a->parent->right = b;
@@ -45,7 +33,7 @@ private:
 		recorrect(a);
 		recorrect(b);
 	}
-	void smallLeft1(Node<TypeKey, TypeData>* a) {
+	void smallLeft(Node<TypeKey, TypeData>* a) {
 		Node <TypeKey, TypeData>* b = a->right;
 		if (HasParent(a))
 			if (a->parent->right == a) a->parent->right = b;
@@ -60,19 +48,19 @@ private:
 		recorrect(a);
 		recorrect(b);
 	}
-	void bigRight1(Node<TypeKey, TypeData>* a) {
+	void bigRight(Node<TypeKey, TypeData>* a) {
 		if (HasRightChild(a->left))
-			smallLeft1(a->left);
+			smallLeft(a->left);
 		else return;
-		smallRight1(a);
+		smallRight(a);
 	}
-	void bigLeft1(Node<TypeKey, TypeData>* a) {
+	void bigLeft(Node<TypeKey, TypeData>* a) {
 		if (HasLeftChild(a->right))
-			smallRight1(a->right);
+			smallRight(a->right);
 		else return;
-		smallLeft1(a);
+		smallLeft(a);
 	}
-	void rebalance1(Node<TypeKey, TypeData>* n) {
+	void rebalance(Node<TypeKey, TypeData>* n) {
 		Node<TypeKey, TypeData>* c = n;
 		Node<TypeKey, TypeData>* b = 0;
 		Node<TypeKey, TypeData>* a = 0;
@@ -88,10 +76,10 @@ private:
 			diff_c = difference(c);
 			diff_b = difference(b);
 			if (diff_c <= 0 && diff_b == -2) {
-				smallLeft1(b);
+				smallLeft(b);
 			}
 			else if (diff_c >= 0 && diff_b == 2) {
-				smallRight1(b);
+				smallRight(b);
 			}
 			c = b;
 		}
@@ -108,10 +96,10 @@ private:
 			diff_b = difference(b);
 			diff_a = difference(a);
 			if (/*diff_c <= 1 &&*/ diff_b == 1 && diff_a == -2) {
-				bigLeft1(a);
+				bigLeft(a);
 			}
 			else if (/*diff_c <= 1 && */ diff_b == -1 && diff_a == 2) {
-				bigRight1(a);
+				bigRight(a);
 			}
 			c = b;
 			b = a;
@@ -362,7 +350,7 @@ public:
 					n2->right = n1;
 				else
 					n2->left = n1;
-				rebalance1(n1);
+				rebalance(n1);
 			}
 			else if (n1->storage.first == key) {
 				n1->storage.second = d;
@@ -371,7 +359,7 @@ public:
 		}
 	}
 //--------------------------------------------------------------------------------//
-	bool remove1(const TypeKey & key) {
+	bool remove(const TypeKey & key) {
 		Node<TypeKey, TypeData>* DeleteNode = root;
 		while (DeleteNode !=0 && DeleteNode->storage.first != key)
 			DeleteNode->storage.first < key ? DeleteNode = DeleteNode->right : DeleteNode = DeleteNode->left;
@@ -407,7 +395,7 @@ public:
 				tmp->parent = DeleteNode->parent;
 				tmp->left = DeleteNode->left;
 				tmp->height = DeleteNode->height;
-				rebalance1(tmp);
+				rebalance(tmp);
 				DeleteNode = 0;
 			}
 			else if (HasLeftChild(DeleteNode)) {//т.е есть слева, нет справа
@@ -419,7 +407,7 @@ public:
 					else if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = tmp;
 				}
 				tmp->height = DeleteNode->height;
-				rebalance1(tmp);
+				rebalance(tmp);
 				DeleteNode = 0;
 			}
 			else {
@@ -430,7 +418,7 @@ public:
 					else if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = 0;
 				}
 				DeleteNode = 0;
-				if (tmp!=0)rebalance1(tmp);
+				if (tmp!=0)rebalance(tmp);
 			}
 			return true;
 		}
@@ -444,159 +432,3 @@ public:
 		return root->height;
 	}
 };
-
-
-/*
-	bool remove(const TypeKey& key) {
-		Node<TypeKey, TypeData>* n1 = root; //начинаем с корня
-		Node<TypeKey, TypeData>* startCheck = 0;
-		while (n1 != 0 && n1->storage.first != key)
-			n1->storage.first < key ? n1 = n1->right : n1 = n1->left;
-		if (n1 == 0) //такого ключа нет, то false
-			return false;
-		if (n1->storage.first == key) {// нашли ключ
-			Node<TypeKey, TypeData>* nr = 0;//новый "локальный" корень, который будет вместо удаленной ноды
-			if (HasRightChild(n1)) {//если есть справа
-				nr = n1->right; //запоминаем правую ноду от удаленной, он новый "локальный" корень
-				Node<TypeKey, TypeData>* n2 = nr;//пойдем влево до конца, туда запишем левую ноду удаленной ноды
-				while (HasLeftChild(n2))
-					n2 = n2->left;
-				n2->left = n1->left;//здесь записываем
-				if (HasLeftChild(n1))
-					n1->left->parent = n2;
-				startCheck = n2;//как раз здесь мы запоминаем, где начать, чтобы не искать потом
-			}
-			else if (HasLeftChild(n1))//если справа нет и слева есть, то просто левую оставляем
-				nr = n1->left;
-
-
-			if (nr == 0 && n1->parent == 0) {//сыновей не было, не было отца, значит корень
-				root = 0;
-			}
-			else if (n1->parent == 0) {//какие-то сыновья были, но удаленная вершина была корнем
-				nr->parent = 0;
-				root = nr;
-				rebalance(root, 0);
-			}
-			else {//был отец
-				if(nr!=0) nr->parent = n1->parent;//если вершина пустая, то просто к ней не обращаемся и дальше как обычно
-				if (n1->parent->left != 0 && n1->parent->left->storage.first == key)
-					n1->parent->left = nr;
-				else
-					n1->parent->right = nr;
-				if (startCheck == 0) {
-					if (nr == 0) rebalance(n1->parent, 0);
-					else rebalance(nr, 0);
-				}
-				else rebalance(startCheck,0);
-			}
-			delete n1;
-			return true;
-		}
-	}
-
-	void smallRight(Node<TypeKey, TypeData>* a) {
-		bool change_root = false;//флаг если корень меняем
-		Node<TypeKey, TypeData>* b = a->left;
-		if (HasParent(a))
-			if (a->parent->right == a) a->parent->right = b;//меняем у отца a какого то сына на b
-			else a->parent->left = b;
-		else change_root = true; //если отца нет, то мы в корне
-		b->parent = a->parent;//меняем отца b
-
-		if (HasRightChild(b)) b->right->parent = a;//если справа был сын, то меняем ему отца с b на a
-		a->left = b->right;//меняем сына
-
-		b->right = a;//меняем сына
-		a->parent = b;//меняем отца
-
-		a = b;//поменяем их местами, а то я запутался
-		b = a->right;
-
-		if (change_root) root = a;
-
-		recorrect(b);
-		recorrect(a);
-
-	}
-	void smallLeft(Node<TypeKey, TypeData>* a) {//здесь так же, как и в левом повороте
-		bool change_root = false;
-		Node<TypeKey, TypeData>* b = a->right;
-		if (HasParent(a)) {
-			if(a->parent->right==a) a->parent->right = b;
-			else a->parent->left = b;
-		}
-		else change_root = true;
-		b->parent = a->parent;
-
-		if (HasLeftChild(b)) b->left->parent = a;
-		a->right = b->left;
-
-		b->left = a;
-		a->parent = b;
-
-		a = b;
-		b = a->left;
-
-		if (change_root) root = a;
-
-		recorrect(b);
-		recorrect(a);
-	}
-	void bigRight(Node<TypeKey, TypeData>* a) {
-		smallLeft(a->left);
-		smallRight(a);
-	}
-	void bigLeft(Node<TypeKey, TypeData>* a) {
-		smallRight(a->right);
-		smallLeft(a);
-	}
-	void rebalance(Node<TypeKey, TypeData>* n, bool type) {
-		Node<TypeKey, TypeData>* c = n;
-		Node<TypeKey, TypeData>* b = 0;
-		Node<TypeKey, TypeData>* a = 0;
-		int diff_c = 0;
-		int diff_b = 0;
-		int diff_a = 0;
-
-		recorrect(c);//обновляем высоту рассматриваемой верш.
-		while (HasParent(c)) { //идем, пока не дойдем до корня
-			b = c->parent;
-			recorrect(b);//обновляем высоту отца
-			if (HasParent(b)) { // если у отца есть отец, берем его
-				a = b->parent;
-				recorrect(a);
-			}
-			else a = 0;
-
-			//делаем повороты
-
-			diff_c = difference(c);
-			diff_b = difference(b);
-			diff_a = 0;
-			if (a != 0) diff_a = difference(a);
-
-			if (diff_c <= 0 && diff_b == -2) {
-				smallLeft(b);
-				if (type) return;
-			}
-			else if (diff_c <= 0 && diff_b == 2) {
-				smallRight(b);
-				if (type) return;
-			}
-			else if (diff_c <= 1 && diff_b == 1 && diff_a == -2) {
-				bigLeft(a);
-				if (type) return;
-			}
-			else if (diff_c <= 1 && diff_b == -1 && diff_a == 2) {
-				bigRight(a);
-				if (type) return;
-			}
-			c = b;
-		}
-	}
-
-
-
-
-*/
