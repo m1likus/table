@@ -46,7 +46,7 @@ private:
 		recorrect(b);
 	}
 	void smallLeft1(Node<TypeKey, TypeData>* a) {
-		Node<TypeKey, TypeData>* b = a->right;
+		Node <TypeKey, TypeData>* b = a->right;
 		if (HasParent(a))
 			if (a->parent->right == a) a->parent->right = b;
 			else a->parent->left = b;
@@ -61,11 +61,15 @@ private:
 		recorrect(b);
 	}
 	void bigRight1(Node<TypeKey, TypeData>* a) {
-		smallLeft1(a->left);
+		if (HasRightChild(a->left))
+			smallLeft1(a->left);
+		else return;
 		smallRight1(a);
 	}
 	void bigLeft1(Node<TypeKey, TypeData>* a) {
-		smallRight1(a->right);
+		if (HasLeftChild(a->right))
+			smallRight1(a->right);
+		else return;
 		smallLeft1(a);
 	}
 	void rebalance1(Node<TypeKey, TypeData>* n) {
@@ -114,10 +118,6 @@ private:
 		}
 		c = n;
 		b = 0;
-		//while (c != 0) {
-		//	recorrect(c);
-		//	c = c->parent;
-		//}
 	}
 
 	int my_max(int a, int b) {
