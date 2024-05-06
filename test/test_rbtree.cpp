@@ -208,6 +208,9 @@ TEST(RbTreeTable, test_height) {
                 firstHeight = a.getHeight();
                 a.insert(i, 20);
                 secondHeight = a.getHeight();
+                if (abs(secondHeight - firstHeight) > 1) {
+                    cout << i << "/n";
+                }
             }
             b[i] = 1;
             //cout << i << " " << a.getHeight() << "\n";

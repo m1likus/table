@@ -581,7 +581,43 @@ public:
 	}
 //--------------------------------------------------------------------------------//
 	int getHeight() { //высота для всего дерева
-		return root->height;
+		int h = 0;
+		int max_h = 0;
+		Node<TypeKey, TypeData>* n = root;
+		while (n->left != 0) {
+			if (n->colour == false) h++;
+			n = n->left;
+		}
+		if (h > max_h) max_h = h;
+		while (true) {
+			Node<TypeKey, TypeData>* it_node = n;
+			if (it_node->right != 0) {
+				if (it_node->colour == false) h++;
+				it_node = it_node->right;
+				while (it_node->left != 0) {
+					if (it_node->colour == false) h++;
+					it_node = it_node->left;
+				}
+			}
+			else {
+				Node<TypeKey, TypeData>* save_node(it_node);
+				while (it_node->parent != 0 && it_node->parent->right == it_node) {
+					if (it_node->colour == false) h--;
+					it_node = it_node->parent; //если мы сейчас в правом сыне, то идем наверх, пока не станем левым сыном или пока не дойдем до корня
+				}
+				if (it_node->parent == 0) {//если мы в корне, то возвращаем +1 к последнему
+					it_node = save_node;
+					break;
+				}
+				else if (it_node->parent->left == it_node) { //если мы в левом сыне, то просто переходим к родителю
+					if (it_node->colour == false) h--;
+					it_node = it_node->parent;
+				}
+			}
+			n = it_node;
+			if (h > max_h) max_h = h;
+		}
+		return max_h;
 	}
 };
 
