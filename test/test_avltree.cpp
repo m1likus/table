@@ -230,6 +230,49 @@ TEST(AvlTreeTable, test_height) {
     }
 }
 
+TEST(AvlTreeTable, test_insert_and_remove_while_delta) {
+    int avlTreeN = 1000;
+    int N = 2000;
+    vector<int> vec_insert(N);
+    vector<int> vec_remove(N + avlTreeN);
+    std::iota(vec_insert.begin(), vec_insert.end(), 0);
+    std::iota(vec_remove.begin(), vec_remove.end(), 0);
+    int seed = 1;
+    random_device rd;
+    mt19937 g(rd());
+    std::shuffle(vec_insert.begin(), vec_insert.end(), g);
+
+    AvlTreeTable<int, int> a;
+    for (int i = 0; i < avlTreeN; i++) {
+        EXPECT_NO_THROW(a.insert(vec_insert[i], vec_insert[i]));
+        swap(vec_insert[i], vec_insert[vec_insert.size() - 1]);
+        vec_insert.pop_back();
+    }
+
+    for (int j = 0; j < 100; j++) {
+        std::shuffle(vec_insert.begin(), vec_insert.end(), g);
+        std::shuffle(vec_remove.begin(), vec_remove.end(), g);
+        for (int i = 0; i < 100; i++) {
+            int firstHeight = a.getHeight();
+            EXPECT_NO_THROW(a.insert(vec_insert[i], vec_insert[i]));
+            int secondHeight = a.getHeight();
+            EXPECT_LE(std::abs(secondHeight - firstHeight), 1);
+            vec_remove.push_back(vec_insert[i]);
+            swap(vec_insert[i], vec_insert[vec_insert.size() - 1]);
+            vec_insert.pop_back();
+        }
+        for (int i = 0; i < 100; i++) {
+            int firstHeight = a.getHeight();
+            EXPECT_NO_THROW(a.remove(vec_remove[i]));
+            int secondHeight = a.getHeight();
+            EXPECT_LE(std::abs(secondHeight - firstHeight), 1);
+            vec_insert.push_back(vec_remove[i]);
+            swap(vec_remove[i], vec_remove[vec_remove.size() - 1]);
+            vec_remove.pop_back();
+        }
+    }
+}
+
 
 TEST(AvlTreeTable, test_height1) {
     AvlTreeTable<int, int> a;
