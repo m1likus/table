@@ -25,17 +25,71 @@ private:
 	}
 
 	inline bool HasUncle(Node <TypeKey, TypeData>* node) {
-		if (!HasParent(node)) return false;
-		if (node->parent->right == node) {
-			if (!HasLeftChild(node->parent))
-				return false;
+		if (!HasGrandparent(node)) return false;
+		if (node->parent->parent->left == node->parent) {
+			if (!HasRightChild(node->parent->parent)) return false;
 		}
-		else 
-			if (!HasRightChild(node->parent))
-				return false;
+		else {
+			if (!HasLeftChild(node->parent->parent)) return false;
+		}
 		return true;
 	}
-	void rebalance(Node <TypeKey, TypeData>* Node) {}
+
+	Node <TypeKey, TypeData>* Uncle (Node <TypeKey, TypeData>* node) {
+		if (node->parent->parent->left == node->parent) {
+			if (HasRightChild(node->parent->parent))
+				return node->parent->parent->right;
+		}
+		else {
+			if (HasLeftChild(node->parent->parent))
+				return node->parent->parent->left;
+		}
+	}
+
+	void Repaint(Node <TypeKey, TypeData>* node) {
+		//надо поменять раскраски отца и деда
+		//может нарушиться правило для деда,вызывать рекурсивно перебалансировку
+		node->parent->colour = black;
+		node->parent->parent = red;
+		Uncle(node)->colour = black;
+		rebalance(node->parent->parent);
+	}
+
+
+	bool Check(Node <TypeKey, TypeData>* node) {
+		if (node->colour == red) { //если сама вершина красная
+			if (HasParent(node)) { 
+				if (node->parent->colour == red) return true; //если отец - красный, то нужна ребалансировка
+			}
+			if (HasLeftChild(node)) {
+				if (node->left->colour == red) return true; // если левый сын - красный, то ..
+			}
+			if (HasRightChild(node)) {
+				if (node->right->colour == red) return true; // если правый сын - красный, то ..
+			}
+			return false;
+		}
+		return false;
+	}
+
+	void rebalance(Node <TypeKey, TypeData>* node) {
+		//проверка на нарушение 4 правила
+		if (!Check) return;
+		//нарушение есть - начинаем магию.
+
+		//случай 1: дядя красный, решение - перекраска.
+		if (HasUncle(node)) {
+			if (Uncle(node)->colour == red)
+				Repaint(node);
+		}
+		//случай 2: черный дядя, папа и дед в разных сторонах.
+		if (HasUncle(node)) {
+			if (Uncle(node)->colour == black) {
+				//TODO
+			}
+		}
+	
+	}
 
 public:
 	RbTreeTable() { //конструктор по умолчанию
