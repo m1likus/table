@@ -1,19 +1,19 @@
-#pragma once
+п»ї#pragma once
 #include "binTreeTable.h"
 
-//Правила для Красно-черных деревьев:
-// 1) Корень - черный
-// 2) Все листы - null, всегда черные
-// 3) Каждая верш. черная/красная, всегда 2 потомка (с учетом null-листов)
-// 4) У красной вершины потомки - черные 
+//РџСЂР°РІРёР»Р° РґР»СЏ РљСЂР°СЃРЅРѕ-С‡РµСЂРЅС‹С… РґРµСЂРµРІСЊРµРІ:
+// 1) РљРѕСЂРµРЅСЊ - С‡РµСЂРЅС‹Р№
+// 2) Р’СЃРµ Р»РёСЃС‚С‹ - null, РІСЃРµРіРґР° С‡РµСЂРЅС‹Рµ
+// 3) РљР°Р¶РґР°СЏ РІРµСЂС€. С‡РµСЂРЅР°СЏ/РєСЂР°СЃРЅР°СЏ, РІСЃРµРіРґР° 2 РїРѕС‚РѕРјРєР° (СЃ СѓС‡РµС‚РѕРј null-Р»РёСЃС‚РѕРІ)
+// 4) РЈ РєСЂР°СЃРЅРѕР№ РІРµСЂС€РёРЅС‹ РїРѕС‚РѕРјРєРё - С‡РµСЂРЅС‹Рµ 
 //				<=>
-//	В дереве не может быть две красные вершины подряд
-// 5) Является сбалансированным относительно черной вершины.
-//	  height по черным вершинам всегда одинаков
-// 6) При вставке любой вершины - она всегда красная.
+//	Р’ РґРµСЂРµРІРµ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РґРІРµ РєСЂР°СЃРЅС‹Рµ РІРµСЂС€РёРЅС‹ РїРѕРґСЂСЏРґ
+// 5) РЇРІР»СЏРµС‚СЃСЏ СЃР±Р°Р»Р°РЅСЃРёСЂРѕРІР°РЅРЅС‹Рј РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ С‡РµСЂРЅРѕР№ РІРµСЂС€РёРЅС‹.
+//	  height РїРѕ С‡РµСЂРЅС‹Рј РІРµСЂС€РёРЅР°Рј РІСЃРµРіРґР° РѕРґРёРЅР°РєРѕРІ
+// 6) РџСЂРё РІСЃС‚Р°РІРєРµ Р»СЋР±РѕР№ РІРµСЂС€РёРЅС‹ - РѕРЅР° РІСЃРµРіРґР° РєСЂР°СЃРЅР°СЏ.
 //
 //
-// Соблюдение этих правил гарантирует нам черно-красное дерево.
+// РЎРѕР±Р»СЋРґРµРЅРёРµ СЌС‚РёС… РїСЂР°РІРёР» РіР°СЂР°РЅС‚РёСЂСѓРµС‚ РЅР°Рј С‡РµСЂРЅРѕ-РєСЂР°СЃРЅРѕРµ РґРµСЂРµРІРѕ.
 
 template <typename TypeKey, typename TypeData>
 class RbTreeTable : public BinTreeTable<TypeKey, TypeData> {
@@ -46,101 +46,167 @@ private:
 		}
 	}
 
+	Node <TypeKey, TypeData>* Grandparent(Node <TypeKey, TypeData>* node) {
+		return node->parent->parent;
+	}
+
+
+
 	void Repaint(Node <TypeKey, TypeData>* node) {
-		//надо поменять раскраски отца и деда
-		//может нарушиться правило для деда,вызывать рекурсивно перебалансировку
+		//РЅР°РґРѕ РїРѕРјРµРЅСЏС‚СЊ СЂР°СЃРєСЂР°СЃРєРё РѕС‚С†Р° Рё РґРµРґР°
+		//РјРѕР¶РµС‚ РЅР°СЂСѓС€РёС‚СЊСЃСЏ РїСЂР°РІРёР»Рѕ РґР»СЏ РґРµРґР°,РІС‹Р·С‹РІР°С‚СЊ СЂРµРєСѓСЂСЃРёРІРЅРѕ РїРµСЂРµР±Р°Р»Р°РЅСЃРёСЂРѕРІРєСѓ
 		node->parent->colour = black;
-		node->parent->parent = red;
+		node->parent->parent->colour = red;
 		Uncle(node)->colour = black;
 		rebalance(node->parent->parent);
 	}
 
 
 	bool Check(Node <TypeKey, TypeData>* node) {
-		if (node->colour == red) { //если сама вершина красная
+		if (node->colour == red) { //РµСЃР»Рё СЃР°РјР° РІРµСЂС€РёРЅР° РєСЂР°СЃРЅР°СЏ
 			if (HasParent(node)) { 
-				if (node->parent->colour == red) return true; //если отец - красный, то нужна ребалансировка
+				if (node->parent->colour == red) return true; //РµСЃР»Рё РѕС‚РµС† - РєСЂР°СЃРЅС‹Р№, С‚Рѕ РЅСѓР¶РЅР° СЂРµР±Р°Р»Р°РЅСЃРёСЂРѕРІРєР°
 			}
 			if (HasLeftChild(node)) {
-				if (node->left->colour == red) return true; // если левый сын - красный, то ..
+				if (node->left->colour == red) return true; // РµСЃР»Рё Р»РµРІС‹Р№ СЃС‹РЅ - РєСЂР°СЃРЅС‹Р№, С‚Рѕ ..
 			}
 			if (HasRightChild(node)) {
-				if (node->right->colour == red) return true; // если правый сын - красный, то ..
+				if (node->right->colour == red) return true; // РµСЃР»Рё РїСЂР°РІС‹Р№ СЃС‹РЅ - РєСЂР°СЃРЅС‹Р№, С‚Рѕ ..
 			}
 			return false;
 		}
 		return false;
 	}
 
-	void rebalance(Node <TypeKey, TypeData>* node) {
-		//проверка на нарушение 4 правила
-		if (!Check) return;
-		//нарушение есть - начинаем магию.
+	void smallRight(Node<TypeKey, TypeData>* a) {
+		Node<TypeKey, TypeData>* b = a->left;
+		if (HasParent(a))
+			if (a->parent->right == a) a->parent->right = b;
+			else a->parent->left = b;
+		else root = b;
+		b->parent = a->parent;
+		if (HasRightChild(b)) b->right->parent = a;
+		a->left = b->right;
+		b->right = a;
+		a->parent = b;
 
-		//случай 1: дядя красный, решение - перекраска.
-		if (HasUncle(node)) {
-			if (Uncle(node)->colour == red)
-				Repaint(node);
+		//recorrect(a);
+		//recorrect(b);
+	}
+	void smallLeft(Node<TypeKey, TypeData>* a) {
+		Node <TypeKey, TypeData>* b = a->right;
+		if (HasParent(a))
+			if (a->parent->right == a) a->parent->right = b;
+			else a->parent->left = b;
+		else root = b;
+		b->parent = a->parent;
+		if (HasLeftChild(b)) b->left->parent = a;
+		a->right = b->left;
+		b->left = a;
+		a->parent = b;
+
+		//recorrect(a);
+		//recorrect(b);
+	}
+	void bigRight(Node<TypeKey, TypeData>* a) {
+		smallRight(a);
+		a->colour=red;
+		a->parent->colour = black;
+	}
+	void bigLeft(Node<TypeKey, TypeData>* a) {
+		smallLeft(a);
+		a->colour = red;
+		a->parent->colour = black;
+	}
+
+	void rebalance(Node <TypeKey, TypeData>* node) {
+		if (node == root) {
+			node->colour = black;
+			return;
 		}
-		//случай 2: черный дядя, папа и дед в разных сторонах.
-		if (HasUncle(node)) {
-			if (Uncle(node)->colour == black) {
-				//TODO
+		//РїСЂРѕРІРµСЂРєР° РЅР° РЅР°СЂСѓС€РµРЅРёРµ 4 РїСЂР°РІРёР»Р°
+		else if (!Check(node)) return;
+		//РЅР°СЂСѓС€РµРЅРёРµ РµСЃС‚СЊ - РЅР°С‡РёРЅР°РµРј РјР°РіРёСЋ.
+
+
+		//СЃР»СѓС‡Р°Р№ 1: РґСЏРґСЏ РєСЂР°СЃРЅС‹Р№, СЂРµС€РµРЅРёРµ - РїРµСЂРµРєСЂР°СЃРєР°.
+		if (HasUncle(node) && Uncle(node)->colour == red)
+			Repaint(node);
+		else { //Рµ. РґСЏРґСЏ РЅРµ РєСЂР°СЃРЅС‹Р№ - РѕРЅ РІСЃРµРіРґР° С‡С‘СЂРЅС‹Р№
+			//СЃР»СѓС‡Р°Р№ 2: С‡РµСЂРЅС‹Р№ РґСЏРґСЏ, РїР°РїР° Рё РґРµРґ РІ СЂР°Р·РЅС‹С… СЃС‚РѕСЂРѕРЅР°С….
+			if (HasGrandparent(node) && node->parent->right == node && Grandparent(node)->left == node->parent){
+				smallLeft(node->parent);
+				node = node->left;
 			}
+			else if (HasGrandparent(node) && node->parent->left == node && Grandparent(node)->right == node->parent){
+				smallRight(node->parent);
+				node = node->right;
+			}
+			//СЃР»СѓС‡Р°Р№ 3: С‡РµСЂРЅС‹Р№ РґСЏРґСЏ, РїР°РїР° Рё РґРµРґ РІ РѕРґРЅРѕР№ СЃС‚РѕСЂРѕРЅРµ
+			if (HasGrandparent(node)) {
+				if (Grandparent(node)->left == node->parent) { //РїР°РїР°(P) Рё РґРµРґ(G) СЃР»РµРІР°, Р·РЅР°С‡РёС‚ Рё СѓР·РµР»(X) РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ СЃР»РµРІР°
+					if (node->parent->left == node) bigRight(Grandparent(node));
+					else return;
+				}
+				else if ((Grandparent(node)->right == node->parent)) { //РїР°РїР°(P) Рё РґРµРґ(G) СЃРїСЂР°РІР°, Р·РЅР°С‡РёС‚ Рё СѓР·РµР»(X) РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ СЃРїСЂР°РІР°
+					if (node->parent->right == node) bigLeft(Grandparent(node));
+					else return;
+				}
+			}
+			else return;
 		}
-	
 	}
 
 public:
-	RbTreeTable() { //конструктор по умолчанию
+	RbTreeTable() { //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 		root = 0;
 	}
 	//--------------------------------------------------------------------------------//
-	RbTreeTable(const RbTreeTable& other) { //конструктор копирования
-		if (other.root == 0) { //если пустое - то будет пустое
+	RbTreeTable(const RbTreeTable& other) { //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
+		if (other.root == 0) { //РµСЃР»Рё РїСѓСЃС‚РѕРµ - С‚Рѕ Р±СѓРґРµС‚ РїСѓСЃС‚РѕРµ
 			root = 0;
 		}
 		else {
-			root = new Node<TypeKey, TypeData>(); //создаем узел корня
-			root->parent = 0; //пустой корень
+			root = new Node<TypeKey, TypeData>(); //СЃРѕР·РґР°РµРј СѓР·РµР» РєРѕСЂРЅСЏ
+			root->parent = 0; //РїСѓСЃС‚РѕР№ РєРѕСЂРµРЅСЊ
 			root->left = 0;
 			root->right = 0;
 			root->colour = black;
-			root->storage = other.root->storage;  //скопировали хранилище
+			root->storage = other.root->storage;  //СЃРєРѕРїРёСЂРѕРІР°Р»Рё С…СЂР°РЅРёР»РёС‰Рµ
 			root->height = other.root->height;
-			Node<TypeKey, TypeData>* n1 = root; //где были
-			Node<TypeKey, TypeData>* n2 = root; //куда идем
-			Node<TypeKey, TypeData>* other_n1 = other.root; //где были в other
-			Node<TypeKey, TypeData>* other_n2 = other.root; //куда идем в other
-			while (n2 != 0) { //пока есть куда идти
+			Node<TypeKey, TypeData>* n1 = root; //РіРґРµ Р±С‹Р»Рё
+			Node<TypeKey, TypeData>* n2 = root; //РєСѓРґР° РёРґРµРј
+			Node<TypeKey, TypeData>* other_n1 = other.root; //РіРґРµ Р±С‹Р»Рё РІ other
+			Node<TypeKey, TypeData>* other_n2 = other.root; //РєСѓРґР° РёРґРµРј РІ other
+			while (n2 != 0) { //РїРѕРєР° РµСЃС‚СЊ РєСѓРґР° РёРґС‚Рё
 				n1 = n2;
 				other_n1 = other_n2;
 				if (HasLeftChild(other_n1) && !HasLeftChild(n1)) {
-					//если левый потомок в other не пуст, а в this пуст, то
-					other_n2 = other_n1->left; //приходим в левый потомок other
-					n2 = new Node<TypeKey, TypeData>(); //раз пуст, то создадим новый узел
-					n2->parent = n1; //заполним его
+					//РµСЃР»Рё Р»РµРІС‹Р№ РїРѕС‚РѕРјРѕРє РІ other РЅРµ РїСѓСЃС‚, Р° РІ this РїСѓСЃС‚, С‚Рѕ
+					other_n2 = other_n1->left; //РїСЂРёС…РѕРґРёРј РІ Р»РµРІС‹Р№ РїРѕС‚РѕРјРѕРє other
+					n2 = new Node<TypeKey, TypeData>(); //СЂР°Р· РїСѓСЃС‚, С‚Рѕ СЃРѕР·РґР°РґРёРј РЅРѕРІС‹Р№ СѓР·РµР»
+					n2->parent = n1; //Р·Р°РїРѕР»РЅРёРј РµРіРѕ
 					n2->left = 0;
 					n2->right = 0;
 					n2->storage = other_n2->storage;
 					n2->height = other_n2->height;
 					n2->colour = other_n2->colour;
-					n1->left = n2; //переходим в потомок this
+					n1->left = n2; //РїРµСЂРµС…РѕРґРёРј РІ РїРѕС‚РѕРјРѕРє this
 				}
 				else if (HasRightChild(other_n1) && !HasRightChild(n1)) {
-					//если правый потомок other не пуст, а в this пуст, то
-					other_n2 = other_n1->right; //переходим в правый потомок other
-					n2 = new Node<TypeKey, TypeData>(); //создаем новый узел
-					n2->parent = n1; //заполняем
+					//РµСЃР»Рё РїСЂР°РІС‹Р№ РїРѕС‚РѕРјРѕРє other РЅРµ РїСѓСЃС‚, Р° РІ this РїСѓСЃС‚, С‚Рѕ
+					other_n2 = other_n1->right; //РїРµСЂРµС…РѕРґРёРј РІ РїСЂР°РІС‹Р№ РїРѕС‚РѕРјРѕРє other
+					n2 = new Node<TypeKey, TypeData>(); //СЃРѕР·РґР°РµРј РЅРѕРІС‹Р№ СѓР·РµР»
+					n2->parent = n1; //Р·Р°РїРѕР»РЅСЏРµРј
 					n2->left = 0;
 					n2->right = 0;
 					n2->storage = other_n2->storage;
 					n2->height = other_n2->height;
 					n2->colour = other_n2->colour;
-					n1->right = n2; //переходим в потомок this
+					n1->right = n2; //РїРµСЂРµС…РѕРґРёРј РІ РїРѕС‚РѕРјРѕРє this
 				}
 				else {
-					//если и правый и левый пуст - переходим в родителя
+					//РµСЃР»Рё Рё РїСЂР°РІС‹Р№ Рё Р»РµРІС‹Р№ РїСѓСЃС‚ - РїРµСЂРµС…РѕРґРёРј РІ СЂРѕРґРёС‚РµР»СЏ
 					n2 = n1->parent;
 					other_n2 = other_n1->parent;
 				}
@@ -149,22 +215,22 @@ public:
 		}
 	}
 	//--------------------------------------------------------------------------------//
-	BinTreeTable& operator=(const BinTreeTable& other) { //оператор присваивания
+	BinTreeTable& operator=(const BinTreeTable& other) { //РѕРїРµСЂР°С‚РѕСЂ РїСЂРёСЃРІР°РёРІР°РЅРёСЏ
 		if (&other != this) {
-			if (root == 0) { //если дерево чему присваиваем пустое
+			if (root == 0) { //РµСЃР»Рё РґРµСЂРµРІРѕ С‡РµРјСѓ РїСЂРёСЃРІР°РёРІР°РµРј РїСѓСЃС‚РѕРµ
 				if (other.root == 0) {
 					root = 0;
 				}
-				else { //начинаем создавать новое дерево
-					root = new Node<TypeKey, TypeData>(); //создаем корень
-					root->parent = 0; //заполняем
+				else { //РЅР°С‡РёРЅР°РµРј СЃРѕР·РґР°РІР°С‚СЊ РЅРѕРІРѕРµ РґРµСЂРµРІРѕ
+					root = new Node<TypeKey, TypeData>(); //СЃРѕР·РґР°РµРј РєРѕСЂРµРЅСЊ
+					root->parent = 0; //Р·Р°РїРѕР»РЅСЏРµРј
 					root->left = 0;
 					root->right = 0;
 					root->colour = black;
 					root->storage = other.root->storage;
 					root->height = other.root->height;
-					Node<TypeKey, TypeData>* n1 = root; //были
-					Node<TypeKey, TypeData>* n2 = root; //стали
+					Node<TypeKey, TypeData>* n1 = root; //Р±С‹Р»Рё
+					Node<TypeKey, TypeData>* n2 = root; //СЃС‚Р°Р»Рё
 					Node<TypeKey, TypeData>* other_n1 = other.root;
 					Node<TypeKey, TypeData>* other_n2 = other.root;
 					while (n2 != 0) {
@@ -200,8 +266,8 @@ public:
 
 				}
 			}
-			else { //если не пустое
-				if (other.root == 0) { //е. то что присваиваем пустое - удаляем все
+			else { //РµСЃР»Рё РЅРµ РїСѓСЃС‚РѕРµ
+				if (other.root == 0) { //Рµ. С‚Рѕ С‡С‚Рѕ РїСЂРёСЃРІР°РёРІР°РµРј РїСѓСЃС‚РѕРµ - СѓРґР°Р»СЏРµРј РІСЃРµ
 					Node<TypeKey, TypeData>* n1 = root;
 					Node<TypeKey, TypeData>* n2 = root;
 					while (n2 != NULL) {
@@ -223,7 +289,7 @@ public:
 					delete n2;
 					root = 0;
 				}
-				else { //если были оба не пустыми
+				else { //РµСЃР»Рё Р±С‹Р»Рё РѕР±Р° РЅРµ РїСѓСЃС‚С‹РјРё
 					root->storage = other.root->storage;
 					Node<TypeKey, TypeData>* n1 = root;
 					Node<TypeKey, TypeData>* n2 = root;
@@ -332,9 +398,9 @@ public:
 				n1->storage = make_pair(key, d);
 				n1->left = 0;
 				n1->right = 0;
-				n1->parent = 0;
+				n1->parent = n2;
 				n1->height = 0;
-				n1->colour = red; //всегда вставляем красную вершину
+				n1->colour = red; //РІСЃРµРіРґР° РІСЃС‚Р°РІР»СЏРµРј РєСЂР°СЃРЅСѓСЋ РІРµСЂС€РёРЅСѓ
 				if (n2->storage.first < n1->storage.first)
 					n2->right = n1;
 				else
@@ -358,16 +424,20 @@ public:
 			if (HasRightChild(DeleteNode)) {
 				tmp = DeleteNode->right;
 				while (HasLeftChild(tmp))
-					tmp = tmp->left; //нашли min
-				//переприсваиваем
-				if (DeleteNode->right == tmp) { //правым сыном DeleteNode м.б. сама tmp
+					tmp = tmp->left; //РЅР°С€Р»Рё min
+				//РїРµСЂРµРїСЂРёСЃРІР°РёРІР°РµРј
+				Node<TypeKey, TypeData>* saveNode = 0;
+				if (DeleteNode->right == tmp) { //РїСЂР°РІС‹Рј СЃС‹РЅРѕРј DeleteNode Рј.Р±. СЃР°РјР° tmp
 					if (HasLeftChild(DeleteNode)) {
 						DeleteNode->left->parent = tmp;
 					}
 				}
 				else {
 					tmp->parent->left = tmp->right;
-					if (HasRightChild(tmp)) tmp->right->parent = tmp->parent;//
+					if (HasRightChild(tmp)){
+						tmp->right->parent = tmp->parent;//
+						saveNode = tmp->right;
+					}
 					if (HasLeftChild(DeleteNode)) {
 						DeleteNode->left->parent = tmp;
 					}
@@ -385,10 +455,11 @@ public:
 				tmp->left = DeleteNode->left;
 				tmp->height = DeleteNode->height;
 				tmp->colour = DeleteNode->colour;
-				rebalance(tmp);
+				if (saveNode != 0) rebalance(saveNode);
+				else rebalance(tmp);
 				DeleteNode = 0;
 			}
-			else if (HasLeftChild(DeleteNode)) {//т.е есть слева, нет справа
+			else if (HasLeftChild(DeleteNode)) {//С‚.Рµ РµСЃС‚СЊ СЃР»РµРІР°, РЅРµС‚ СЃРїСЂР°РІР°
 				if (DeleteNode == root) root = tmp;
 				tmp = DeleteNode->left;
 				tmp->parent = DeleteNode->parent;
@@ -397,27 +468,60 @@ public:
 					else if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = tmp;
 				}
 				tmp->height = DeleteNode->height;
-				tmp->height = DeleteNode->colour;
+				tmp->colour = DeleteNode->colour;
 				rebalance(tmp);
 				DeleteNode = 0;
 			}
 			else {
-				if (DeleteNode == root) root = tmp;
-				if (HasParent(DeleteNode)) {
-					tmp = DeleteNode->parent;
-					if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = 0;
-					else if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = 0;
-				}
-				tmp->colour = DeleteNode->colour;
+				tmp = DeleteNode->parent;
+				if (DeleteNode == root) root = 0;
 				DeleteNode = 0;
-				if (tmp != 0)rebalance(tmp);
+				//if (tmp != 0) rebalance(tmp);
 			}
 			return true;
 		}
 	}
 	//--------------------------------------------------------------------------------//
-	int getHeight() { //высота для всего дерева
-		return root->height;
+	int getHeight() { //РІС‹СЃРѕС‚Р° РґР»СЏ РІСЃРµРіРѕ РґРµСЂРµРІР°
+		int h = 0;
+		int max_h = 0;
+		Node<TypeKey, TypeData>* n = root;
+		while (HasLeftChild(n)) {
+			n = n->left;
+			if (n->colour == black) h++;
+		}
+		if (h > max_h) max_h = h;
+		while (true) {
+			Node<TypeKey, TypeData>* it_node = n;
+			if (HasRightChild(it_node)) {
+				it_node = it_node->right;
+				if (it_node->colour == black) h++;
+				while (HasLeftChild(it_node)) {
+					it_node = it_node->left;
+					if (it_node->colour == black) h++;
+				}
+			}
+			else {
+				Node<TypeKey, TypeData>* save_node = it_node;
+				while (HasParent(it_node) && it_node->parent->right == it_node) {
+					if (it_node->colour == black) h--;
+					it_node = it_node->parent; //ГҐГ±Г«ГЁ Г¬Г» Г±ГҐГ©Г·Г Г± Гў ГЇГ°Г ГўГ®Г¬ Г±Г»Г­ГҐ, ГІГ® ГЁГ¤ГҐГ¬ Г­Г ГўГҐГ°Гµ, ГЇГ®ГЄГ  Г­ГҐ Г±ГІГ Г­ГҐГ¬ Г«ГҐГўГ»Г¬ Г±Г»Г­Г®Г¬ ГЁГ«ГЁ ГЇГ®ГЄГ  Г­ГҐ Г¤Г®Г©Г¤ГҐГ¬ Г¤Г® ГЄГ®Г°Г­Гї
+					
+				}
+				if (!HasParent(it_node)) {//ГҐГ±Г«ГЁ Г¬Г» Гў ГЄГ®Г°Г­ГҐ, ГІГ® ГўГ®Г§ГўГ°Г Г№Г ГҐГ¬ +1 ГЄ ГЇГ®Г±Г«ГҐГ¤Г­ГҐГ¬Гі
+					it_node = save_node;
+					break;
+				}
+				else if (it_node->parent->left == it_node) { //ГҐГ±Г«ГЁ Г¬Г» Гў Г«ГҐГўГ®Г¬ Г±Г»Г­ГҐ, ГІГ® ГЇГ°Г®Г±ГІГ® ГЇГҐГ°ГҐГµГ®Г¤ГЁГ¬ ГЄ Г°Г®Г¤ГЁГІГҐГ«Гѕ
+					if (it_node->colour == black) h--;
+					it_node = it_node->parent;
+					
+				}
+			}
+			n = it_node;
+			if (h > max_h) max_h = h;
+		}
+		return max_h;
 	}
 };
 

@@ -411,14 +411,10 @@ public:
 				DeleteNode = 0;
 			}
 			else {
-				if (DeleteNode == root) root = tmp;
-				if (HasParent(DeleteNode)) {
-					tmp = DeleteNode->parent;
-					if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = 0;
-					else if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = 0;
-				}
+				tmp = DeleteNode->parent;
+				if (DeleteNode == root) root = 0;
 				DeleteNode = 0;
-				if (tmp!=0)rebalance(tmp);
+				if (tmp != 0) rebalance(tmp);
 			}
 			return true;
 		}

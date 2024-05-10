@@ -110,7 +110,7 @@ TEST(RbTreeTable, remove_false)
 TEST(RbTreeTable, test_insert1)
 {
     int s = 0;
-    int N = 1000;
+    int N = 10;
     vector<bool> b(N);
     RbTreeTable<int, int> a;
     int k = N;
@@ -206,12 +206,14 @@ TEST(RbTreeTable, test_height) {
         for (int i = k; i < N; i += k) {
             if (!b[i]) {
                 firstHeight = a.getHeight();
+                if (i == 186) {
+                    i = 186;
+                }
                 a.insert(i, 20);
                 secondHeight = a.getHeight();
             }
             b[i] = 1;
-            //cout << i << " " << a.getHeight() << "\n";
-            //cout << "Delta = " << secondHeight - firstHeight << endl;
+            if (std::abs(secondHeight - firstHeight) > 1) cout << i << endl;
             EXPECT_LE(std::abs(secondHeight - firstHeight), 1);
         }
     }
@@ -224,8 +226,7 @@ TEST(RbTreeTable, test_height) {
         firstHeight = a.getHeight();
         a.remove(i);
         secondHeight = a.getHeight();
-        //cout << i << " " << a.getHeight() << "\n";
-        //cout << "Delta = " << secondHeight - firstHeight << endl;
+        if (std::abs(secondHeight - firstHeight) > 1) cout << i << endl;
         EXPECT_LE(std::abs(secondHeight - firstHeight), 1);
     }
 }

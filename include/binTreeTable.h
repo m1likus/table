@@ -14,12 +14,12 @@ enum TwoColours {
 template <typename TypeKey, typename TypeData>
 class Node {
 public:
+	TwoColours colour;
 	pair<TypeKey, TypeData> storage;
 	Node* left;
 	Node* right;
 	Node* parent;
 	int height;
-	TwoColours colour;
 
 	bool operator==(const Node& other) {
 		if (key == other.key && data == other.data)
@@ -352,6 +352,8 @@ public:
 		}
 	}
 //--------------------------------------------------------------------------------//
+
+	//TODO
 	bool remove(const TypeKey& key) {
 		Node<TypeKey, TypeData>* n1 = root; //начинаем с корня
 		while (n1 != 0 && n1->storage.first != key) { //пока куда идем !=0 и не равно ключу
