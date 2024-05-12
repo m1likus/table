@@ -27,13 +27,13 @@ int main() {
 		if (f.is_open())cout << "is open\n";
 		cout << "Tree " << "N " << "time \n";
 		f << "N; BinTree; AvlTree; rbTree\n";
-		int n_start = 1000;
-		int n_end = 2000000;
+		int n_start = 100000;
+		int n_end = 20000000;
 		int n_step = (n_end - n_start) / 10;
 		for (int l = n_start; l <= n_end; l += n_step) {
 			int N = l;
 
-			float t1, t2;
+			double t1, t2;
 			random_device rd;
 			int seed = 5;
 			mt19937 g(seed); 
@@ -62,12 +62,12 @@ int main() {
 			f << ";" << t2 - t1;
 
 			//rbTree
-			t1 = clock();
 			RbTreeTable<int, int> c;
+			t1 = clock();
 			for (int i = 0; i < N; i++)
 				c.insert(vec_insert[i], 20);
 			c.insert(N + 1, 20);
-			t2 = clock() ;
+			t2 = clock();
 			cout << "RbTree "<< l << "; " << t2 << "; " << t1 << "; " << t2 - t1 << "\n";
 			f << ";" << t2 - t1 << "\n";
 		}
@@ -82,13 +82,13 @@ int main() {
 		if (f.is_open())cout << "is open\n";
 		cout << "Tree " << "N " << "time \n";
 		f << "N; BinTree; AvlTree; rbTree\n";
-		int n_start = 1000;
-		int n_end = 2000000;
+		int n_start = 100000;
+		int n_end = 20000000;
 		int n_step = (n_end - n_start) / 10;
 		for (int l = n_start; l <= n_end; l += n_step) {
 			int N = l;
 
-			float t1, t2;
+			double t1, t2;
 			random_device rd;
 			int seed = 5;
 			mt19937 g(seed);
@@ -97,7 +97,6 @@ int main() {
 			std::shuffle(vec_insert.begin(), vec_insert.end(), g);
 
 			//BinTree
-			
 			BinTreeTable<int, int> a;
 			for (int i = 0; i < N; i++)
 				a.insert(vec_insert[i], 20);
