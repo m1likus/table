@@ -435,7 +435,7 @@ public:
 				else {
 					tmp->parent->left = tmp->right;
 					if (HasRightChild(tmp)){
-						tmp->right->parent = tmp->parent;//
+						tmp->right->parent = tmp->parent;
 						saveNode = tmp->right;
 					}
 					if (HasLeftChild(DeleteNode)) {
@@ -460,7 +460,7 @@ public:
 				DeleteNode = 0;
 			}
 			else if (HasLeftChild(DeleteNode)) {//т.е есть слева, нет справа
-				if (DeleteNode == root) root = tmp;
+				
 				tmp = DeleteNode->left;
 				tmp->parent = DeleteNode->parent;
 				if (HasParent(DeleteNode)) {
@@ -469,20 +469,24 @@ public:
 				}
 				tmp->height = DeleteNode->height;
 				tmp->colour = DeleteNode->colour;
+				if (DeleteNode == root) root = tmp;
 				rebalance(tmp);
 				DeleteNode = 0;
 			}
 			else {
-				tmp = DeleteNode->parent;
+				if (HasParent(DeleteNode) && DeleteNode->parent->right == DeleteNode)
+					DeleteNode->parent->right = 0;
+				else if (HasParent(DeleteNode) && DeleteNode->parent->left == DeleteNode)
+					DeleteNode->parent->left = 0;
 				if (DeleteNode == root) root = 0;
 				DeleteNode = 0;
-				//if (tmp != 0) rebalance(tmp);
 			}
 			return true;
 		}
 	}
 	//--------------------------------------------------------------------------------//
 	int getHeight() { //высота для всего дерева
+		if (root == 0) return -1;
 		int h = 0;
 		int max_h = 0;
 		Node<TypeKey, TypeData>* n = root;
@@ -505,14 +509,14 @@ public:
 				Node<TypeKey, TypeData>* save_node = it_node;
 				while (HasParent(it_node) && it_node->parent->right == it_node) {
 					if (it_node->colour == black) h--;
-					it_node = it_node->parent; //åñëè ìû ñåé÷àñ â ïðàâîì ñûíå, òî èäåì íàâåðõ, ïîêà íå ñòàíåì ëåâûì ñûíîì èëè ïîêà íå äîéäåì äî êîðíÿ
+					it_node = it_node->parent; 
 					
 				}
-				if (!HasParent(it_node)) {//åñëè ìû â êîðíå, òî âîçâðàùàåì +1 ê ïîñëåäíåìó
+				if (!HasParent(it_node)) {
 					it_node = save_node;
 					break;
 				}
-				else if (it_node->parent->left == it_node) { //åñëè ìû â ëåâîì ñûíå, òî ïðîñòî ïåðåõîäèì ê ðîäèòåëþ
+				else if (it_node->parent->left == it_node) {
 					if (it_node->colour == black) h--;
 					it_node = it_node->parent;
 					

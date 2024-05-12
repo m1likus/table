@@ -378,7 +378,7 @@ public:
 				}
 				else {
 					tmp->parent->left = tmp->right;
-					if (HasRightChild(tmp)) tmp->right->parent = tmp->parent;//
+					if (HasRightChild(tmp)) tmp->right->parent = tmp->parent;
 					if (HasLeftChild(DeleteNode)) {
 						DeleteNode->left->parent = tmp;
 					}
@@ -399,7 +399,7 @@ public:
 				DeleteNode = 0;
 			}
 			else if (HasLeftChild(DeleteNode)) {//т.е есть слева, нет справа
-				if (DeleteNode == root) root = tmp;
+				
 				tmp = DeleteNode->left;
 				tmp->parent = DeleteNode->parent;
 				if (HasParent(DeleteNode)) {
@@ -407,11 +407,15 @@ public:
 					else if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = tmp;
 				}
 				tmp->height = DeleteNode->height;
+				if (DeleteNode == root) root = tmp;
 				rebalance(tmp);
 				DeleteNode = 0;
 			}
 			else {
-				tmp = DeleteNode->parent;
+				if (HasParent(DeleteNode) && DeleteNode->parent->right == DeleteNode)
+					DeleteNode->parent->right = 0;
+				else if (HasParent(DeleteNode) && DeleteNode->parent->left == DeleteNode)
+					DeleteNode->parent->left = 0;
 				if (DeleteNode == root) root = 0;
 				DeleteNode = 0;
 				if (tmp != 0) rebalance(tmp);

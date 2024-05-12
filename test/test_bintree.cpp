@@ -3,7 +3,7 @@
 #include <random>
 #include <vector>
 #include "binTreeTable.h"
-
+#include <numeric>
 
 TEST(BinTreeTable, get_data_by_key_string)
 {
@@ -151,20 +151,25 @@ TEST(BinTreeTable, test_insert_1000elements) {
 TEST(BinTreeTable, test_remove_1000elements) {
     int N = 1000;
     vector<int> b(N);
-    for (int i = 0; i < N; i++) {
-        b[i] = i;
-    }
-    random_device rd;
-    mt19937 g(rd());
-    std::shuffle(b.begin(), b.end(), g);
     BinTreeTable<int, int> a;
-    for (int i = 0; i < N; i++) {
+    std::iota(b.begin(), b.end(), 0);
+
+    random_device rd;
+    int seed = 3;
+    mt19937 g(rd());
+    
+    std::shuffle(b.begin(), b.end(), g);
+    for (int i = 0; i < N; i++)
         a.insert(b[i], b[i]);
-    }
+
     std::shuffle(b.begin(), b.end(), g);
     for (int i = 0; i < N; i++) {
+        if (i == 998)
+            i = 998;
         EXPECT_EQ(a.remove(b[i]), true);
+       
     }
+
     ASSERT_EQ(a.size(), 0);
 }
 

@@ -352,47 +352,61 @@ public:
 		}
 	}
 //--------------------------------------------------------------------------------//
-
-	//TODO
 	bool remove(const TypeKey& key) {
-		Node<TypeKey, TypeData>* n1 = root; //начинаем с корня
-		while (n1 != 0 && n1->storage.first != key) { //пока куда идем !=0 и не равно ключу
-			if (n1->storage.first < key) //если искомый ключ больше ключа в узле n1
-				n1 = n1->right; //идем направо
-			else
-				n1 = n1->left; //иначе налево
-		}
-		if (n1 == 0) //если пусто, то не можем удалить
-			return false;
-		if (n1->storage.first == key) { //если нашли
-			Node<TypeKey, TypeData>* nr = 0; //делаем все через правого потомка
-			if (n1->right != 0) { //если у n1 правый потомок !=0
-				nr = n1->right; //переходим в этого правого потомка
-				Node<TypeKey, TypeData>* n2 = nr; //и создаем еще узел
-				while (n2->left != 0)
-					n2 = n2->left; //переходим в него
-				n2->left = n1->left;
-				if(n1->left!=0)
-					n1->left->parent = n2;
+		Node<TypeKey, TypeData>* DeleteNode = root;
+		while (DeleteNode != 0 && DeleteNode->storage.first != key)
+			DeleteNode->storage.first < key ? DeleteNode = DeleteNode->right : DeleteNode = DeleteNode->left;
+		if (DeleteNode == 0) return false;
+		else if (DeleteNode->storage.first == key) {
+			Node<TypeKey, TypeData>* tmp = 0;
+			if (HasRightChild(DeleteNode)) {
+				tmp = DeleteNode->right;
+				while (HasLeftChild(tmp))
+					tmp = tmp->left; //нашли min
+				//переприсваиваем
+				if (DeleteNode->right == tmp) { //правым сыном DeleteNode м.б. сама tmp
+					if (HasLeftChild(DeleteNode)) {
+						DeleteNode->left->parent = tmp;
+					}
+				}
+				else {
+					tmp->parent->left = tmp->right;
+					if (HasRightChild(tmp)) tmp->right->parent = tmp->parent;//
+					if (HasLeftChild(DeleteNode)) {
+						DeleteNode->left->parent = tmp;
+					}
+					tmp->right = DeleteNode->right;
+					if (HasRightChild(DeleteNode)) {
+						DeleteNode->right->parent = tmp;
+					}
+				}
+				if (DeleteNode == root) root = tmp;
+				if (HasParent(DeleteNode)) {
+					if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = tmp;
+					else if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = tmp;
+				}
+				tmp->parent = DeleteNode->parent;
+				tmp->left = DeleteNode->left;
+				DeleteNode = 0;
 			}
-			else if(n1->left != 0)
-				nr = n1->left;
-			
-			if (nr == 0 && n1->parent == 0) {
-				root = 0;
-			}
-			else if (n1->parent == 0) {
-				nr->parent = 0;
-				root = nr;
+			else if (HasLeftChild(DeleteNode)) {//т.е есть слева, нет справа
+				tmp = DeleteNode->left;
+				tmp->parent = DeleteNode->parent;
+				if (HasParent(DeleteNode)) {
+					if (DeleteNode->parent->left == DeleteNode) DeleteNode->parent->left = tmp;
+					else if (DeleteNode->parent->right == DeleteNode) DeleteNode->parent->right = tmp;
+				}
+				if (DeleteNode == root) root = tmp;
+				DeleteNode = 0;
 			}
 			else {
-				if(nr!=0) nr->parent = n1->parent;
-				if (n1->parent->left!=0 && n1->parent->left->storage.first == key)
-					n1->parent->left = nr;
-				else
-					n1->parent->right = nr;
+				if (HasParent(DeleteNode) && DeleteNode->parent->right == DeleteNode)
+					DeleteNode->parent->right = 0;
+				else if (HasParent(DeleteNode) && DeleteNode->parent->left == DeleteNode)
+					DeleteNode->parent->left = 0;
+				if (DeleteNode == root) root = 0;
+				DeleteNode = 0;
 			}
-			delete n1;
 			return true;
 		}
 	}
@@ -420,37 +434,38 @@ public:
 	}
 //--------------------------------------------------------------------------------//
 	int getHeight() { //высота для всего дерева
+		if (root == 0) return -1;
 		int h = 0; 
 		int max_h = 0;
 		Node<TypeKey, TypeData>* n = root;
-		while (n->left != 0) {
+		while (HasLeftChild(n)) {
 			n = n->left;
 			h++;
 		}
 		if (h > max_h) max_h = h; 
 		while (true) {
 			Node<TypeKey, TypeData>* it_node = n;
-			if (it_node->right != 0) { 
+			if (HasRightChild(it_node)) { 
 				it_node = it_node->right;
 				h++;
-				while (it_node->left != 0) {
+				while (HasLeftChild(it_node)) {
 					it_node = it_node->left;
 					h++;
 				}
 			}
 			else {
-				Node<TypeKey, TypeData>* save_node(it_node);
-				while (it_node->parent != 0 && it_node->parent->right == it_node) {
-					it_node = it_node->parent; //если мы сейчас в правом сыне, то идем наверх, пока не станем левым сыном или пока не дойдем до корня
+				Node<TypeKey, TypeData>* save_node = it_node;
+				while (HasParent(it_node) && it_node->parent->right == it_node) {
 					h--;
+					it_node = it_node->parent; //если мы сейчас в правом сыне, то идем наверх, пока не станем левым сыном или пока не дойдем до корня
 				}
-				if (it_node->parent == 0) {//если мы в корне, то возвращаем +1 к последнему
+				if (!HasParent(it_node)) {//если мы в корне, то возвращаем +1 к последнему
 					it_node = save_node;
 					break;
 				}
 				else if (it_node->parent->left == it_node) { //если мы в левом сыне, то просто переходим к родителю
-					it_node = it_node->parent;
 					h--;
+					it_node = it_node->parent;
 				}
 			}
 			n = it_node;
@@ -516,7 +531,7 @@ public:
 			}
 			iterator = &(n1->storage);
 		}
-		else if (it_node->left != 0) {//если есть слева, то идем влево...
+		else if (it_node->left !=0 ) {//если есть слева, то идем влево...
 			it_node = it_node->left;
 			while (it_node->right != 0)//если есть справа, то идем вправо до конца
 				it_node = it_node->right;
